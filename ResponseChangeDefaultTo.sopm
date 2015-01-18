@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<otrs_package version="1.0">
+  <Name></Name>
+  <Version>1.0.0</Version>
+  <Framework>4.0.x</Framework>
+  <Vendor>spline.de</Vendor>
+  <URL>http://www.spline.de/</URL>
+  <License>GNU AFFERO GENERAL PUBLIC LICENSE Version 3, November 2007</License>
+  <Description Lang="en"></Description>
+  <Description Lang="de"></Description>
+  <BuildDate>?</BuildDate>
+  <BuildHost>?</BuildHost>
+  <Filelist>
+    <File Permission="644" Location="Kernel/Output/HTML/ResponseChangeDefaultTo.pm"/>
+    <File Permission="644" Location="Kernel/Config/Files/ResponseChangeDefaultTo.xml"/>
+    <File Permission="644" Location="Kernel/System/ResponseChangeDefaultTo.pm"/>
+  </Filelist>
+  <DatabaseInstall>
+    <TableCreate Name="response_change_default_to">
+      <Column Name="id" Required="true" PrimaryKey="true" AutoIncrement="true" Type="BIGINT"/>
+      <Column Name="title" Required="true" Size="250" Type="VARCHAR"/>
+      <Column Name="remove_default" Required="true" Type="SMALLINT"/>
+      <Column Name="add_new" Required="true" Type="SMALLINT"/>
+      <Column Name="new_address" Required="true" Size="255" Type="VARCHAR"/>
+      <Index Name="response_change_default_to_title">
+        <IndexColumn Name="title"/>
+      </Index>
+      <Unique Name="response_change_default_to_title">
+        <UniqueColumn Name="title"/>
+      </Unique>
+    </TableCreate>
+    <TableCreate Name="response_change_default_to_response">
+      <Column Name="id" Required="true" PrimaryKey="true" AutoIncrement="true" Type="BIGINT"/>
+      <Column Name="response_change_default_to_id" Required="true" Type="BIGINT"/>
+      <Column Name="response_id" Required="true" Type="BIGINT"/>
+      <Index Name="response_change_default_to_response_response_change_default_to_id">
+        <IndexColumn Name="response_change_default_to_id"/>
+      </Index>
+      <Index Name="response_change_default_to_response_response_id">
+        <IndexColumn Name="response_id"/>
+      </Index>
+      <ForeignKey ForeignTable="response_change_default_to">
+        <Reference Local="response_change_default_to_id" Foreign="id"/>
+      </ForeignKey>
+      <ForeignKey ForeignTable="standard_template">
+        <Reference Local="response_id" Foreign="id"/>
+      </ForeignKey>
+    </TableCreate>
+  </DatabaseInstall>
+  <DatabaseUninstall>
+    <TableDrop Name="response_change_default_to"/>
+    <TableDrop Name="response_change_default_to_response"/>
+  </DatabaseUninstall>
+</otrs_package>
