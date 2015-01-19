@@ -9,11 +9,7 @@ use strict;
 use warnings;
 
 our @ObjectDependencies = qw(
-    Kernel::Config
-    Kernel::System::DB
-    Kernel::System::Encode
     Kernel::System::Log
-    Kernel::System::Main
     Kernel::System::ResponseChangeDefaultTo
 );
 
@@ -23,11 +19,7 @@ sub new {
     # allocate new hash for object
     my $Self = {};
     $Self->{LayoutObject} = $Param{$_} || die "Got no $_!";
-    $Self->{ConfigObject} = $Kernel::OM->Get('Kernel::Config');
-    $Self->{DBObject} = $Kernel::OM->Get('Kernel::System::DB');
-    $Self->{EncodeObject} = $Kernel::OM->Get('Kernel::System::Encode');
     $Self->{LogObject} = $Kernel::OM->Get('Kernel::System::Log');
-    $Self->{MainObject} = $Kernel::OM->Get('Kernel::System::Main');
     $Self->{ResponseChangeDefaultToObject} =
         $Kernel::OM->Get('Kernel::System::ResponseChangeDefaultTo');
     bless( $Self, $Type );
@@ -39,8 +31,7 @@ sub Run {
     my ( $Self, %Param ) = @_;
     return if !$Self->{LayoutObject};
 
-    for (qw(DBObject EncodeObject ConfigObject LogObject MainObject
-            LayoutObject ResponseChangeDefaultToObject)) {
+    for (qw(LogObject LayoutObject ResponseChangeDefaultToObject)) {
         return if !$Self->{$_};
     }
 
