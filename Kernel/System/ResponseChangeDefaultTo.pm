@@ -125,7 +125,7 @@ sub Get {
 
     # get RrsponseChangeDefaultTO obejct
     return if !$Self->{DBObject}->Prepare(
-        SQL => 'SELECT id, title, remove_default, add_new new_address '
+        SQL => 'SELECT id, title, remove_default, add_new, new_address '
              . 'FROM response_change_default_to WHERE id = ?',
         Bind  => [ \$Param{ID} ],
         Limit => 1,
