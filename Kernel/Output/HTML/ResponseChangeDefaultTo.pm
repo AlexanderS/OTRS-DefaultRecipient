@@ -18,7 +18,7 @@ sub new {
 
     # allocate new hash for object
     my $Self = {};
-    $Self->{LayoutObject} = $Param{$_} || die "Got no $_!";
+    $Self->{LayoutObject} = $Param{LayoutObject} || die "Got no LayoutObject!";
     $Self->{LogObject} = $Kernel::OM->Get('Kernel::System::Log');
     $Self->{ResponseChangeDefaultToObject} =
         $Kernel::OM->Get('Kernel::System::ResponseChangeDefaultTo');
