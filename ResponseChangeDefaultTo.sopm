@@ -52,7 +52,7 @@
     </TableCreate>
   </DatabaseInstall>
   <DatabaseUninstall>
-    <TableDrop Name="response_change_default_to"/>
     <TableDrop Name="response_change_default_to_response"/>
+    <TableDrop Name="response_change_default_to"/>
   </DatabaseUninstall>
 </otrs_package>
