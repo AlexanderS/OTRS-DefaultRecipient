@@ -330,7 +330,7 @@ sub MappingList {
     }
 
     while ( my @Data = $Self->{DBObject}->FetchrowArray() ) {
-        $Mapping{ $Data[1] }->{MappingID} = $Data[0];
+        $Mapping{ $Data[0] }->{MappingID} = $Data[1];
     }
 
     return %Mapping;
