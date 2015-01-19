@@ -25,7 +25,7 @@
       <Index Name="response_change_default_to_title">
         <IndexColumn Name="title"/>
       </Index>
-      <Unique Name="response_change_default_to_title">
+      <Unique Name="response_change_default_to_unique_title">
         <UniqueColumn Name="title"/>
       </Unique>
     </TableCreate>
