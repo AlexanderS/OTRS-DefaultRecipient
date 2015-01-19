@@ -21,7 +21,7 @@
       <Column Name="title" Required="true" Size="250" Type="VARCHAR"/>
       <Column Name="remove_default" Required="true" Type="SMALLINT"/>
       <Column Name="add_new" Required="true" Type="SMALLINT"/>
-      <Column Name="new_address" Required="true" Size="255" Type="VARCHAR"/>
+      <Column Name="new_address" Required="false" Size="255" Type="VARCHAR"/>
       <Index Name="response_change_default_to_title">
         <IndexColumn Name="title"/>
       </Index>
