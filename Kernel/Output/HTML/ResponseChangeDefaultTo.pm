@@ -56,9 +56,45 @@ sub Run {
         }
     } 
 
-    # remove preselected "To" address
-    $Self->{LayoutObject}->{BlockData} =
-        grep { $_->{Name} ne 'PreFilledToRow' } @BlockData;
+    # return if not generated from template
+    return unless $Ticket{ResponseID};
+
+    # get all ResponseChangeDefaultTo
+    my %MappedResponseChangeDefaultTo =
+        $Self->{ResponseChangeDefaultToObject}->MappingList(
+            ResponseID => $Ticket{ResponseID},        
+        );
+
+    my $RemoveDefault = 0;
+    my @Addresses = ();
+    foreach ( values %MappedResponseChangeDefaultTo ) {
+        my $ID = $_->{MappingID};
+        my %ResponseChangeDefaultTo =
+            $Self->{ResponseChangeDefaultToObject}->Get(
+                ID => $ID,
+            );
+
+        $RemoveDefault = 1 if $ResponseChangeDefaultTo{RemoveDefault};
+        if ( $ResponseChangeDefaultTo{AddNew} ) {
+            push @Addresses, $ResponseChangeDefaultTo{NewAddress};
+        }
+    }
+
+    if ( $RemoveDefault ) {
+        # remove preselected "To" address
+        $Self->{LayoutObject}->{BlockData} =
+            grep { $_->{Name} ne 'PreFilledToRow' } @BlockData;
+    }
+
+    # add new addresses
+    foreach my $Address ( @Addresses ) {
+        $Self->{LayoutObject}->Block(
+            Name => 'PreFilledToRow',
+            Data => {
+                Email => $Address,
+            },
+        );
+    }
 
     return $Param{Data};
 }
