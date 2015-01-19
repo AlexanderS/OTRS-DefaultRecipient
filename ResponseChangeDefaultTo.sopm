@@ -39,6 +39,10 @@
       <Index Name="response_change_default_to_response_response_id">
         <IndexColumn Name="response_id"/>
       </Index>
+      <Unique Name="response_change_default_to_response_map">
+        <UniqueColumn Name="response_change_default_to_id"/>
+        <UniqueColumn Name="response_id"/>
+      </Unique>
       <ForeignKey ForeignTable="response_change_default_to">
         <Reference Local="response_change_default_to_id" Foreign="id"/>
       </ForeignKey>
