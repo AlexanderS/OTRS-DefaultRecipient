@@ -44,25 +44,25 @@ sub Run {
         $Self->{LayoutObject}->FatalDie();
     }
 
-    my @BlockData = $Self->{LayoutObject}->{BlockData};
+    my $BlockData = $Self->{LayoutObject}->{BlockData};
 
     # get ticket data
-    my %Ticket = ();
+    my $Ticket;
     BLOCK:
-    for my $block ( @BlockData ) {
+    for my $block ( @$BlockData ) {
         if ( $block->{Name} eq 'TicketBack' ) {
-            %Ticket = $block->{Data};
+            $Ticket = $block->{Data};
             last BLOCK;
         }
     } 
 
     # return if not generated from template
-    return unless $Ticket{ResponseID};
+    return unless $Ticket->{ResponseID};
 
     # get all ResponseChangeDefaultTo
     my %MappedResponseChangeDefaultTo =
         $Self->{ResponseChangeDefaultToObject}->MappingList(
-            ResponseID => $Ticket{ResponseID},        
+            ResponseID => $Ticket->{ResponseID},
         );
 
     my $RemoveDefault = 0;
@@ -82,8 +82,13 @@ sub Run {
 
     if ( $RemoveDefault ) {
         # remove preselected "To" address
-        $Self->{LayoutObject}->{BlockData} =
-            grep { $_->{Name} ne 'PreFilledToRow' } @BlockData;
+        for my $block ( @$BlockData ) {
+            if ( $block->{Name} eq 'PreFilledToRow' ) {
+                $block->{Data} = undef;
+            }
+        }
+
+        $Self->{LayoutObject}->{BlockData} = $BlockData;
     }
 
     # add new addresses
