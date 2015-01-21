@@ -15,4 +15,24 @@
             </Hash>
         </Setting>
     </ConfigItem>
+    <ConfigItem Name="Frontend::Module###AdminResponseChangeDefaultToTemplates" Required="0" Valid="1">
+        <Description Translatable="1">Frontend module registration for the agent interface.</Description>
+        <Group>Ticket</Group>
+        <SubGroup>Frontend::Admin::ModuleRegistration</SubGroup>
+        <Setting>
+            <FrontendModuleReg>
+                <Group>admin</Group>
+                <Description>Admin</Description>
+                <Title Translatable="1">Templates &lt;-&gt; ResponseChangeDefaultTo</Title>
+                <NavBarName>Admin</NavBarName>
+                <NavBarModule>
+                    <Module>Kernel::Output::HTML::NavBarModuleAdmin</Module>
+                    <Name Translatable="1">Templates &lt;-&gt; ResponseChangeDefaultTo</Name>
+                    <Description Translatable="1">Link templates to ResponseChangeDefaultTo.</Description>
+                    <Block>Queue</Block>
+                    <Prio>300</Prio>
+                </NavBarModule>
+            </FrontendModuleReg>
+        </Setting>
+    </ConfigItem>
 </otrs_config>

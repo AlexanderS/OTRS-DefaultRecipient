@@ -11,8 +11,10 @@
   <BuildDate>?</BuildDate>
   <BuildHost>?</BuildHost>
   <Filelist>
-    <File Permission="644" Location="Kernel/Output/HTML/ResponseChangeDefaultTo.pm"/>
     <File Permission="644" Location="Kernel/Config/Files/ResponseChangeDefaultTo.xml"/>
+    <File Permission="644" Location="Kernel/Modules/AdminResponseChangeDefaultToTemplates.pm"/>
+    <File Permission="644" Location="Kernel/Output/HTML/ResponseChangeDefaultTo.pm"/>
+    <File Permission="644" Location="Kernel/Output/HTML/Standard/AdminResponseChangeDefaultToTemplates.tt"/>
     <File Permission="644" Location="Kernel/System/ResponseChangeDefaultTo.pm"/>
   </Filelist>
   <DatabaseInstall>
