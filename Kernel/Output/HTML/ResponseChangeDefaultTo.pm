@@ -67,8 +67,7 @@ sub Run {
 
     my $RemoveDefault = 0;
     my @Addresses = ();
-    foreach ( values %MappedResponseChangeDefaultTo ) {
-        my $ID = $_->{MappingID};
+    foreach my $ID ( values %MappedResponseChangeDefaultTo ) {
         my %ResponseChangeDefaultTo =
             $Self->{ResponseChangeDefaultToObject}->Get(
                 ID => $ID,
