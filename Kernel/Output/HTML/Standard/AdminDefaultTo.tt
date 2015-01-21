@@ -1,0 +1,212 @@
+# --
+# AdminDefaultTo.tt - provides HTML form for AdminDefaultTo
+# Copyright (C) 2015 Alexander Sulfrian <alex@spline.inf.fu-berlin.de>
+# --
+# This software comes with ABSOLUTELY NO WARRANTY. For details, see
+# the enclosed file COPYING for license information (AGPL). If you
+# did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+# --
+
+[% RenderBlockStart("Overview") %]
+<div class="MainBox ARIARoleMain LayoutFixedSidebar SidebarFirst">
+    <h1>[% Translate("Manage DefaultTo") | html %]</h1>
+
+    <div class="SidebarColumn">
+[% RenderBlockStart("ActionList") %]
+        <div class="WidgetSimple">
+            <div class="Header"><h2>[% Translate("Actions") | html %]</h2></div>
+            <div class="Content">
+                <ul class="ActionList">
+[% RenderBlockStart("ActionOverview") %]
+                    <li>
+                        <a href="[% Env("Baselink") %]Action=[% Env("Action") %]" class="CallForAction Fullsize Center"><span><i class="fa fa-caret-left"></i>[% Translate("Go to overview") | html %]</span></a>
+                    </li>
+[% RenderBlockEnd("ActionOverview") %]
+[% RenderBlockStart("ActionAdd") %]
+                    <li>
+                        <a href="[% Env("Baselink") %]Action=[% Env("Action") %];Subaction=Add" class="CallForAction Fullsize Center"><span><i class="fa fa-plus-square"></i>[% Translate("Add DefaultTo") | html %]</span></a>
+                    </li>
+[% RenderBlockEnd("ActionAdd") %]
+                </ul>
+            </div>
+        </div>
+[% RenderBlockStart("Filter") %]
+        <div class="WidgetSimple">
+            <div class="Header">
+                <h2><label for="Filter">[% Translate("Filter") | html %]</label></h2>
+            </div>
+            <div class="Content">
+                <input type="text" id="Filter" class="FilterBox" placeholder="[% Translate("Just start typing to filter...") | html %]" name="Filter" value="" title="[% Translate("Filter") | html %]" />
+            </div>
+        </div>
+[% RenderBlockEnd("Filter") %]
+[% RenderBlockEnd("ActionList") %]
+
+        <div class="WidgetSimple">
+            <div class="Header">
+                <h2>[% Translate("Hint") | html %]</h2>
+            </div>
+            <div class="Content">
+
+                <p class="FieldExplanation">
+                    [% Translate("With DefaultTo you could change or extend the default To address in a ticket response dependent on the used template.") | html %]
+                </p>
+                <p>
+                    [% Translate("Attention") | html %]:
+                    <a href="[% Env("Baselink") %]Action=AdminDefaultToTemplates">[% Translate("Don't forget to add new DefaultTo entries to templates.") | html %]</a>
+                </p>
+            </div>
+        </div>
+    </div>
+    <div class="ContentColumn">
+
+[% RenderBlockStart("OverviewResult") %]
+        <div class="WidgetSimple">
+            <div class="Header">
+                <h2>[% Translate("List") | html %]</h2>
+            </div>
+            <div class="Content">
+                <table class="DataTable" id="DefaultTo">
+                    <thead>
+                        <tr>
+                            <th>[% Translate("Title") | html %]</th>
+                            <th>[% Translate("Remove default") | html %]</th>
+                            <th>[% Translate("Add new") | html %]</th>
+                            <th>[% Translate("New address") | html %]</th>
+                            <th>[% Translate("Comment") | html %]</th>
+                            <th>[% Translate("Changed") | html %]</th>
+                            <th>[% Translate("Created") | html %]</th>
+                            <th>[% Translate("Delete") | html %]</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr class="FilterMessage Hidden">
+                            <td colspan="7">[% Translate("No matches found.") | html %]</td>
+                        </tr>
+[% RenderBlockStart("NoDataFoundMsg") %]
+                        <tr>
+                            <td colspan="7">
+                                [% Translate("No data found.") | html %]
+                            </td>
+                        </tr>
+[% RenderBlockEnd("NoDataFoundMsg") %]
+[% RenderBlockStart("OverviewResultRow") %]
+                        <tr>
+                            <td>
+                                <a class="AsBlock" href="[% Env("Baselink") %]Action=[% Env("Action") %];Subaction=Change;ID=[% Data.ID | uri %]">[% Data.Name | html %]</a>
+                            </td>
+                            <td>[% Translate(Data.RemoveDefault) | html %]</td>
+                            <td>[% Translate(Data.AddNew) | html %]</td>
+                            <td>[% Data.NewAddress | html %]</td>
+                            <td title="[% Data.Comment | html %]">[% Data.Comment | truncate(26) | html %]</td>
+                            <td>[% Data.ChangeTime | Localize("TimeShort") %]</td>
+                            <td>[% Data.CreateTime | Localize("TimeShort") %]</td>
+                            <td class="Center">
+                                <a class="TrashCan" href="[% Env("Baselink") %]Action=[% Env("Action") %];Subaction=Delete;ID=[% Data.ID | uri %];[% Env("ChallengeTokenParam") | html %]" title="[% Translate("Delete this entry") | html %]">
+                                    [% Translate("Delete this entry") | html %]
+                                    <i class="fa fa-trash-o"></i>
+                                </a>
+                            </td>
+                        </tr>
+[% RenderBlockEnd("OverviewResultRow") %]
+                    </tbody>
+                </table>
+            </div>
+        </div>
+[% WRAPPER JSOnDocumentComplete %]
+<script type="text/javascript">//<![CDATA[
+    Core.UI.Table.InitTableFilter($('#Filter'), $('#DefaultTo'));
+//]]></script>
+[% END %]
+[% RenderBlockEnd("OverviewResult") %]
+[% RenderBlockStart("OverviewUpdate") %]
+
+        <div class="WidgetSimple">
+            <div class="Header">
+[% RenderBlockStart("HeaderAdd") %]
+                <h2>[% Translate("Add DefaultTo") | html %]</h2>
+[% RenderBlockEnd("HeaderAdd") %]
+[% RenderBlockStart("HeaderEdit") %]
+                <h2>[% Translate("Edit DefaultTo") | html %]</h2>
+[% RenderBlockEnd("HeaderEdit") %]
+            </div>
+            <div class="Content">
+                <form action="[% Env("CGIHandle") %]" method="post" class="Validate PreventMultipleSubmits">
+                    <input type="hidden" name="Action" value="[% Env("Action") %]"/>
+                    <input type="hidden" name="Subaction" value="[% Data.Action | uri %]Action"/>
+                    <input type="hidden" name="ID" value="[% Data.ID | html %]"/>
+                    <fieldset class="TableLike">
+                        <label class="Mandatory" for="TemplateType"><span class="Marker">*</span> [% Translate("Title") | html %]:</label>
+                        <div class="Field">
+                            <input type="text" name="Title" id="Title" value="[% Data.Title | html %]" class="W50pc Validate_Required [% Date.TitleInvalid | html %]" maxlength="200"/>
+                            <div id="DefaultToTitleError" class="TooltipErrorMessage">
+                                <p>[% Translate("This field is required.") | html %]</p>
+                            </div>
+                            <div id="DefaultToTitleServerError" class="TooltipErrorMessage">
+[% RenderBlockStart("TitleServerError") %]
+                                <p>[% Translate("This field is required.") | html %]</p>
+[% RenderBlockEnd("TitleServerError") %]
+[% RenderBlockStart("ExistTitleServerError") %]
+                                <p>[% Translate("A DefaultTo entry with this title already exists!") | html %]</p>
+[% RenderBlockEnd("TitleServerError") %]
+                            </div>
+                        </div>
+                        <div class="Clear"></div>
+
+                        <label class="Mandatory" for="Name"><span class="Marker">*</span> [% Translate("Remove default") | html %]:</label>
+                        <div class="Field">
+                            [% Data.DefaultToRemoveDefaultOption %]
+                            <div id="RemoveDefaultError" class="TooltipErrorMessage">
+                                <p>[% Translate("This field is required.") | html %]</p>
+                            </div>
+                            <div id="RemoveDefaultServerError" class="TooltipErrorMessage">
+                                <p>[% Translate("This field is required.") | html %]</p>
+                            </div>
+                        </div>
+                        <div class="Clear"></div>
+
+                        <label class="Mandatory" for="Name"><span class="Marker">*</span> [% Translate("Add new") | html %]:</label>
+                        <div class="Field">
+                            [% Data.DefaultToAddNewOption %]
+                            <div id="AddNewError" class="TooltipErrorMessage">
+                                <p>[% Translate("This field is required.") | html %]</p>
+                            </div>
+                            <div id="AddNewServerError" class="TooltipErrorMessage">
+                                <p>[% Translate("This field is required.") | html %]</p>
+                            </div>
+                        </div>
+                        <div class="Clear"></div>
+
+                        <label class="Mandatory" for="Name"><span class="Marker">*</span> [% Translate("New address") | html %]:</label>
+                        <div class="Field">
+                            <input type="text" name="NewAddress" id="NewAddress" value="[% Data.NewAddress | html %]" class="W50pc Validate_Required" maxlength="200"/>
+                            <div id="NewAddressError" class="TooltipErrorMessage">
+                                <p>[% Translate("This field is required.") | html %]</p>
+                            </div>
+                            <div id="NewAddressServerError" class="TooltipErrorMessage">
+                                <p>[% Translate("This field is required.") | html %]</p>
+                            </div>
+                        </div>
+                        <div class="Clear"></div>
+
+                        <label for="Comment">[% Translate("Comment") | html %]:</label>
+                        <div class="Field">
+                            <input type="text" name="Comment" id="Comment" value="[% Data.Comment | html %]" class="W50pc" maxlength="250"/>
+                        </div>
+                        <div class="Clear"></div>
+
+                        <div class="Field">
+                            <button class="Primary CallForAction" type="submit" value="[% Translate("Submit") | html %]"><span>[% Translate("Submit") | html %]</span></button>
+                            [% Translate("or") | html %]
+                            <a href="[% Env("Baselink") %]Action=AdminDefaultTo">[% Translate("Cancel") | html %]</a>
+                        </div>
+                        <div class="Clear"></div>
+                    </fieldset>
+                </form>
+            </div>
+        </div>
+[% RenderBlockEnd("OverviewUpdate") %]
+    </div>
+    <div class="Clear"></div>
+</div>
+[% RenderBlockEnd("Overview") %]

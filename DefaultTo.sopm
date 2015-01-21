@@ -12,8 +12,10 @@
   <BuildHost>?</BuildHost>
   <Filelist>
     <File Permission="644" Location="Kernel/Config/Files/DefaultTo.xml"/>
+    <File Permission="644" Location="Kernel/Modules/AdminDefaultTo.pm"/>
     <File Permission="644" Location="Kernel/Modules/AdminDefaultToTemplates.pm"/>
     <File Permission="644" Location="Kernel/Output/HTML/DefaultTo.pm"/>
+    <File Permission="644" Location="Kernel/Output/HTML/Standard/AdminDefaultTo.tt"/>
     <File Permission="644" Location="Kernel/Output/HTML/Standard/AdminDefaultToTemplates.tt"/>
     <File Permission="644" Location="Kernel/System/DefaultTo.pm"/>
   </Filelist>
