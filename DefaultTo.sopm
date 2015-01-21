@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<otrs_package version="1.0">
+  <Name>DefaultTo</Name>
+  <Version>1.0.0</Version>
+  <Framework>4.0.x</Framework>
+  <Vendor>spline.de</Vendor>
+  <URL>http://www.spline.de/</URL>
+  <License>GNU AFFERO GENERAL PUBLIC LICENSE Version 3, November 2007</License>
+  <Description Lang="en"></Description>
+  <Description Lang="de"></Description>
+  <BuildDate>?</BuildDate>
+  <BuildHost>?</BuildHost>
+  <Filelist>
+    <File Permission="644" Location="Kernel/Config/Files/DefaultTo.xml"/>
+    <File Permission="644" Location="Kernel/Modules/AdminDefaultToTemplates.pm"/>
+    <File Permission="644" Location="Kernel/Output/HTML/DefaultTo.pm"/>
+    <File Permission="644" Location="Kernel/Output/HTML/Standard/AdminDefaultToTemplates.tt"/>
+    <File Permission="644" Location="Kernel/System/DefaultTo.pm"/>
+  </Filelist>
+  <DatabaseInstall>
+    <TableCreate Name="default_to">
+      <Column Name="id" Required="true" PrimaryKey="true" AutoIncrement="true" Type="BIGINT"/>
+      <Column Name="title" Required="true" Size="250" Type="VARCHAR"/>
+      <Column Name="remove_default" Required="true" Type="SMALLINT"/>
+      <Column Name="add_new" Required="true" Type="SMALLINT"/>
+      <Column Name="new_address" Required="false" Size="255" Type="VARCHAR"/>
+      <Index Name="default_to_title">
+        <IndexColumn Name="title"/>
+      </Index>
+      <Unique Name="default_to_unique_title">
+        <UniqueColumn Name="title"/>
+      </Unique>
+    </TableCreate>
+    <TableCreate Name="default_to_response">
+      <Column Name="id" Required="true" PrimaryKey="true" AutoIncrement="true" Type="BIGINT"/>
+      <Column Name="default_to_id" Required="true" Type="BIGINT"/>
+      <Column Name="template_id" Required="true" Type="BIGINT"/>
+      <Index Name="default_to_template_default_to_id">
+        <IndexColumn Name="default_to_id"/>
+      </Index>
+      <Index Name="default_to_template_template_id">
+        <IndexColumn Name="template_id"/>
+      </Index>
+      <Unique Name="default_to_template_map">
+        <UniqueColumn Name="default_to_id"/>
+        <UniqueColumn Name="template_id"/>
+      </Unique>
+      <ForeignKey ForeignTable="default_to">
+        <Reference Local="default_to_id" Foreign="id"/>
+      </ForeignKey>
+      <ForeignKey ForeignTable="standard_template">
+        <Reference Local="template_id" Foreign="id"/>
+      </ForeignKey>
+    </TableCreate>
+  </DatabaseInstall>
+  <DatabaseUninstall>
+    <TableDrop Name="default_to_response"/>
+    <TableDrop Name="default_to"/>
+  </DatabaseUninstall>
+</otrs_package>

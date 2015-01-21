@@ -1,5 +1,5 @@
 # --
-# Kernel/System/ResponseChangeDefaultTo.pm - core module
+# Kernel/System/DefaultTo.pm - core module
 # Copyright (C) 2015 Alexander Sulfrian <alex@spline.inf.fu-berlin.de>
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
@@ -7,7 +7,7 @@
 # did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
 # --
 
-package Kernel::System::ResponseChangeDefaultTo;
+package Kernel::System::DefaultTo;
 
 use strict;
 use warnings;
@@ -46,9 +46,9 @@ sub Add {
         }
     }
 
-    # insert new ResponseChangeDefaultTo
+    # insert new DefaultTo
     return if !$Self->{DBObject}->Do(
-        SQL => 'INSERT INTO response_change_default_to '
+        SQL => 'INSERT INTO default_to '
              . '(title, remove_default, add_new, new_address) '
              . 'VALUES (?, ?, ?, ?)',
         Bind => [
@@ -61,7 +61,7 @@ sub Add {
 
     # get new id
     return if !$Self->{DBObject}->Prepare(
-        SQL   => 'SELECT MAX(id) FROM response_change_default_to WHERE title = ?',
+        SQL   => 'SELECT MAX(id) FROM default_to WHERE title = ?',
         Bind  => [ \$Param{Title}, ],
         Limit => 1,
     );
@@ -74,7 +74,7 @@ sub Add {
     # log notice
     $Self->{LogObject}->Log(
         Priority => 'notice',
-        Message  => "ResponseChangeDefaultTo '$ID' created successfully!",
+        Message  => "DefaultTo '$ID' created successfully!",
     );
 
     return $ID;
@@ -94,9 +94,9 @@ sub Update {
         }
     }
 
-    # insert new ResponseChangeDefaultTo
+    # insert new DefaultTo
     return if !$Self->{DBObject}->Do(
-        SQL => 'UPDATE response_change_default_to SET title = ?, '
+        SQL => 'UPDATE default_to SET title = ?, '
              . 'remove_default = ?, add_new = ?, new_address = ? '
              . 'WHERE id = ?',
         Bind => [
@@ -126,14 +126,14 @@ sub Get {
     # get RrsponseChangeDefaultTO obejct
     return if !$Self->{DBObject}->Prepare(
         SQL => 'SELECT id, title, remove_default, add_new, new_address '
-             . 'FROM response_change_default_to WHERE id = ?',
+             . 'FROM default_to WHERE id = ?',
         Bind  => [ \$Param{ID} ],
         Limit => 1,
     );
 
-    my %ResponseChangeDefaultTo;
+    my %DefaultTo;
     while ( my @Data = $Self->{DBObject}->FetchrowArray() ) {
-        %ResponseChangeDefaultTo = (
+        %DefaultTo = (
             ID            => $Data[0],
             Title         => $Data[1],
             RemoveDefault => $Data[2],
@@ -143,14 +143,14 @@ sub Get {
     }
 
     # make sure we have a valid object
-    return unless %ResponseChangeDefaultTo;
+    return unless %DefaultTo;
 
     # get the assigned responses
     return if !$Self->{DBObject}->Prepare(
         SQL => 'SELECT id, response_id '
              . 'FROM response_change_default_to_response '
              . 'WHERE response_change_default_to_id = ?',
-        Bind => [ \$ResponseChangeDefaultTo{ID} ],
+        Bind => [ \$DefaultTo{ID} ],
     );
 
     while ( my @Data = $Self->{DBObject}->FetchrowArray() ) {
@@ -160,14 +160,14 @@ sub Get {
             );
 
         if ( $Response ) {
-            $ResponseChangeDefaultTo{Responses}->{$Data[0]} = {
+            $DefaultTo{Responses}->{$Data[0]} = {
                 ID => $Data[1],
                 Name => $Response,
             };
         }        
     }
 
-    return %ResponseChangeDefaultTo;
+    return %DefaultTo;
 }
 
 sub Delete {
@@ -184,14 +184,14 @@ sub Delete {
 
     # delete mapping
     return if !$Self->{DBObject}->Do(
-        SQL => 'DELETE FROM response_change_default_to_response '
-             . 'WHERE response_change_default_to_id = ?',
+        SQL => 'DELETE FROM default_to_response '
+             . 'WHERE default_to_id = ?',
         Bind => [ \$Param{ID} ],
     );
 
     # delete entry
     return $Self->{DBObject}->Do(
-        SQL => 'DELETE FROM response_change_default_to WHERE id = ?',
+        SQL => 'DELETE FROM default_to WHERE id = ?',
         Bind  => [ \$Param{ID} ],
     );
 }
@@ -200,22 +200,22 @@ sub List {
     my ( $Self, %Param ) = @_;
 
     $Self->{DBObject}->Prepare(
-        SQL => 'SELECT id, title FROM response_change_default_to',
+        SQL => 'SELECT id, title FROM default_to',
     );
 
-    my %ResponseChangeDefaultTo;
+    my %DefaultTo;
     while ( my @Data = $Self->{DBObject}->FetchrowArray() ) {
-        $ResponseChangeDefaultTo{ $Data[0] } = $Data[1];
+        $DefaultTo{ $Data[0] } = $Data[1];
     }
 
-    return %ResponseChangeDefaultTo;
+    return %DefaultTo;
 }
 
 sub MappingAdd {
     my ( $Self, %Param ) = @_;
 
     # check needed stuff
-    for my $Needed (qw(ResponseID ResponseChangeDefaultToID)) {
+    for my $Needed (qw(TemplateID DefaultToID)) {
         if ( !$Param{$Needed} ) {
             $Self->{LogObject}->Log(
                 Priority => 'error',
@@ -227,21 +227,21 @@ sub MappingAdd {
 
     # insert new mapping
     return if !$Self->{DBObject}->Do(
-        SQL => 'INSERT INTO response_change_default_to_response '
-             . '(response_id, response_change_default_to_id) VALUES (?, ?)',
+        SQL => 'INSERT INTO default_to_response '
+             . '(template_id, default_to_id) VALUES (?, ?)',
         Bind => [
-            \$Param{ResponseID},
-            \$Param{ResponseChangeDefaultToID},
+            \$Param{TemplateID},
+            \$Param{DefaultToID},
         ],
     );
 
     # get new id
     return if !$Self->{DBObject}->Prepare(
-        SQL   => 'SELECT MAX(id) FROM response_change_default_to_response '
-               . 'WHERE response_id = ? AND response_change_default_to_id = ?',
+        SQL   => 'SELECT MAX(id) FROM default_to_response '
+               . 'WHERE template_id = ? AND default_to_id = ?',
         Bind  => [
-            \$Param{ResponseID},
-            \$Param{ResponseChangeDefaultToID}, ],
+            \$Param{TemplateID},
+            \$Param{DefaultToID}, ],
         Limit => 1,
     );
 
@@ -253,7 +253,7 @@ sub MappingAdd {
     # log notice
     $Self->{LogObject}->Log(
         Priority => 'notice',
-        Message  => "ResponseChangeDefaultTo mapping '$ID' "
+        Message  => "DefaultTo mapping '$ID' "
                   . "created successfully!",
     );
 
@@ -274,7 +274,7 @@ sub MappingDelete {
 
     # delete mapping
     return $Self->{DBObject}->Do(
-        SQL => 'DELETE FROM response_change_default_to_response '
+        SQL => 'DELETE FROM default_to_response '
              . 'WHERE id = ?',
         Bind => [ \$Param{ID} ],
     );
@@ -284,29 +284,29 @@ sub MappingList {
     my ( $Self, %Param ) = @_;
 
      # check needed stuff
-    if ( !$Param{ResponseID} && !$Param{ResponseChangeDefaultToID} ) {
+    if ( !$Param{TemplateID} && !$Param{DefaultToID} ) {
         $Self->{LogObject}->Log(
             Priority => 'error',
-            Message  => 'Got no ResponseID or ResponseChangeDefaultToID!'
+            Message  => 'Got no TemplateID or DefaultToID!'
         );
         return;
     }
 
     # find mapped objects
-    if ( $Param{ResponseID} ) {
+    if ( $Param{TemplateID} ) {
         $Self->{DBObject}->Prepare(
-            SQL => 'SELECT id, response_change_default_to_id '
-                 . 'FROM response_change_default_to_response '
-                 . 'WHERE response_id = ?',
-            Bind => [ \$Param{ResponseID}, ],
+            SQL => 'SELECT id, default_to_id '
+                 . 'FROM default_to_response '
+                 . 'WHERE template_id = ?',
+            Bind => [ \$Param{TemplateID}, ],
         );
     }
     else {
         $Self->{DBObject}->Prepare(
-            SQL => 'SELECT id, response_id '
-                 . 'FROM response_change_default_to_response '
-                 . 'WHERE response_change_default_to_id = ?',
-            Bind => [ \$Param{ResponseChangeDefaultToID}, ],
+            SQL => 'SELECT id, template_id '
+                 . 'FROM default_to_response '
+                 . 'WHERE default_to_id = ?',
+            Bind => [ \$Param{DefaultToID}, ],
         );
     }
 

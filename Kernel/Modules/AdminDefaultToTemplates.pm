@@ -1,5 +1,5 @@
 # --
-# Kernel/Modules/AdminResponseChangeDefaultToTemplates.pm - to manage ResponseChangeDefaultTo <-> templates assignments
+# Kernel/Modules/AdminDefaultToTemplates.pm - to manage DefaultTo <-> templates assignments
 # Copyright (C) 2015 Alexander Sulfrian <alex@spline.inf.fu-berlin.de>
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
@@ -7,12 +7,12 @@
 # did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
 # --
 
-package Kernel::Modules::AdminResponseChangeDefaultToTemplates;
+package Kernel::Modules::AdminDefaultToTemplates;
 
 use strict;
 use warnings;
 
-use Kernel::System::ResponseChangeDefaultTo;
+use Kernel::System::DefaultTo;
 use Kernel::System::StandardTemplate;
 
 sub new {
@@ -29,8 +29,7 @@ sub new {
         }
     }
 
-    $Self->{ResponseChangeDefaultToObject} =
-        Kernel::System::ResponseChangeDefaultTo->new(%Param);
+    $Self->{DefaultToObject} = Kernel::System::DefaultTo->new(%Param);
     $Self->{StandardTemplateObject} =
         Kernel::System::StandardTemplate->new(%Param);
 
@@ -41,7 +40,7 @@ sub Run {
     my ( $Self, %Param ) = @_;
 
     # ------------------------------------------------------------ #
-    # template <-> ResponseChangeDefaultTo 1:n
+    # template <-> DefaultTo 1:n
     # ------------------------------------------------------------ #
     if ( $Self->{Subaction} eq 'Template' ) {
 
@@ -53,18 +52,16 @@ sub Run {
         );
         my $Name = $StandardTemplateType . ' - ' . $StandardTemplateData{Name};
 
-        # get ResponseChangeDefaultTo data
-        my %ResponseChangeDefaultToData =
-            $Self->{ResponseChangeDefaultToObject}->List();
-
-        my %Member = $Self->{ResponseChangeDefaultToObject}->MappingList(
-            ResponseID => $ID,
+        # get DefaultTo data
+        my %DefaultToData = $Self->{DefaultToObject}->List();
+        my %Member = $Self->{DefaultToObject}->MappingList(
+            TemplateID => $ID,
         );
 
         my $Output = $Self->{LayoutObject}->Header();
         $Output .= $Self->{LayoutObject}->NavigationBar();
         $Output .= $Self->_Change(
-            Data    => \%ResponseChangeDefaultToData,
+            Data    => \%DefaultToData,
             ID      => $ID,
             Name    => $Name,
             Mapping => \%Member,
@@ -75,13 +72,12 @@ sub Run {
     }
 
     # ------------------------------------------------------------ #
-    # templates <-> ResponseChangeDefaultTo n:1
+    # templates <-> DefaultTo n:1
     # ------------------------------------------------------------ #
-    elsif ( $Self->{Subaction} eq 'ResponseChangeDefaultTo' ) {
+    elsif ( $Self->{Subaction} eq 'DefaultTo' ) {
 
         my $ID = $Self->{ParamObject}->GetParam( Param => 'ID' );
-        my %ResponseChangeDefaultToData =
-            $Self->{ResponseChangeDefaultToObject}->Get( ID => $ID );
+        my %DefaultToData = $Self->{DefaultToObject}->Get( ID => $ID );
 
         # get templates
         my %StandardTemplateData = $Self->{StandardTemplateObject}->StandardTemplateList(
@@ -101,8 +97,8 @@ sub Run {
         }
 
         # get assigned templates
-        my %Member = $Self->{ResponseChangeDefaultToObject}->MappingList(
-            ResponseChangeDefaultToID => $ID,
+        my %Member = $Self->{DefaultToObject}->MappingList(
+            DefaultToID => $ID,
         );
 
         my $Output = $Self->{LayoutObject}->Header();
@@ -110,26 +106,26 @@ sub Run {
         $Output .= $Self->_Change(
             Data    => \%StandardTemplateData,
             ID      => $ID,
-            Name    => $ResponseChangeDefaultToData{Title},
+            Name    => $DefaultToData{Title},
             Mapping => \%Member,
-            Type    => 'ResponseChangeDefaultTo',
+            Type    => 'DefaultTo',
         );
         $Output .= $Self->{LayoutObject}->Footer();
         return $Output;
     }
 
     # ------------------------------------------------------------ #
-    # add templates to ResponseChangeDefaultTo
+    # add templates to DefaultTo
     # ------------------------------------------------------------ #
-    elsif ( $Self->{Subaction} eq 'ChangeResponseChangeDefaultTo' ) {
+    elsif ( $Self->{Subaction} eq 'ChangeDefaultTo' ) {
 
         # challenge token check for write action
         $Self->{LayoutObject}->ChallengeTokenCheck();
 
         # get current mapping
         my $ID = $Self->{ParamObject}->GetParam( Param => 'ID' );
-        my %Mapping = $Self->{ResponseChangeDefaultToObject}->MappingList(
-            ResponseChangeDefaultToID => $ID,
+        my %Mapping = $Self->{DefaultToObject}->MappingList(
+            DefaultToID => $ID,
         );
 
         # get new templates
@@ -143,15 +139,15 @@ sub Run {
         for my $TemplateID (@TemplatesAll) {
             if ( $TemplatesSelected{$TemplateID} ) {
                 if ( ! $Mapping{$TemplateID} ) {
-                    $Self->{ResponseChangeDefaultToObject}->MappingAdd(
-                        ResponseID => $TemplateID,
-                        ResponseChangeDefaultToID => $ID,
+                    $Self->{DefaultToObject}->MappingAdd(
+                        TemplateID => $TemplateID,
+                        DefaultToID => $ID,
                     );
                 }
             }
             else {
                 if ( $Mapping{$TemplateID} ) {
-                    $Self->{ResponseChangeDefaultToObject}->MappingDelete(
+                    $Self->{DefaultToObject}->MappingDelete(
                         ID => $Mapping{$TemplateID},
                     );
                 }
@@ -171,8 +167,8 @@ sub Run {
 
         # get current mapping
         my $ID = $Self->{ParamObject}->GetParam( Param => 'ID' );
-        my %Mapping = $Self->{ResponseChangeDefaultToObject}->MappingList(
-            ResponseID => $ID,
+        my %Mapping = $Self->{DefaultToObject}->MappingList(
+            TemplateID => $ID,
         );
 
         # get new queues
@@ -186,15 +182,15 @@ sub Run {
         for my $DefaultToID (@All) {
             if ( $Selected{$DefaultToID} ) {
                 if ( ! $Mapping{$DefaultToID} ) {
-                    $Self->{ResponseChangeDefaultToObject}->MappingAdd(
-                        ResponseID => $ID,
-                        ResponseChangeDefaultToID => $DefaultToID,
+                    $Self->{DefaultToObject}->MappingAdd(
+                        TemplateID => $ID,
+                        DefaultToID => $DefaultToID,
                     );
                 }
             }
             else {
                 if ( $Mapping{$DefaultToID} ) {
-                    $Self->{ResponseChangeDefaultToObject}->MappingDelete(
+                    $Self->{DefaultToObject}->MappingDelete(
                         ID => $Mapping{$DefaultToID},
                     );
                 }
@@ -220,8 +216,8 @@ sub _Change {
     my %Data    = %{ $Param{Data} };
     my %Mapping = %{ $Param{Mapping} };
     my $Type    = $Param{Type} || 'Template';
-    my $NeType  = 'ResponseChangeDefaultTo';
-    $NeType     = 'Template' if $Type eq 'ResponseChangeDefaultTo';
+    my $NeType  = 'DefaultTo';
+    $NeType     = 'Template' if $Type eq 'DefaultTo';
 
     $Self->{LayoutObject}->Block( Name => 'Overview' );
     $Self->{LayoutObject}->Block( Name => 'ActionList' );
@@ -257,7 +253,7 @@ sub _Change {
     }
 
     return $Self->{LayoutObject}->Output(
-        TemplateFile => 'AdminResponseChangeDefaultToTemplates',
+        TemplateFile => 'AdminDefaultToTemplates',
         Data         => \%Param,
     );
 }
@@ -273,7 +269,7 @@ sub _Overview {
     # no actions in action list
     #    $Self->{LayoutObject}->Block(Name=>'ActionList');
     $Self->{LayoutObject}->Block( Name => 'FilterTemplate' );
-    $Self->{LayoutObject}->Block( Name => 'FilterResponseChangeDefaultTo' );
+    $Self->{LayoutObject}->Block( Name => 'FilterDefaultTo' );
     $Self->{LayoutObject}->Block( Name => 'OverviewResult' );
 
     # get std template list
@@ -319,15 +315,13 @@ sub _Overview {
     }
 
     # get queue data
-    my %ResponseChangeDefaultToData =
-        $Self->{ResponseChangeDefaultToObject}->List();
+    my %DefaultToData = $Self->{DefaultToObject}->List();
 
     # if there are results to show
-    if (%ResponseChangeDefaultToData) {
+    if (%DefaultToData) {
         for my $ID (
-            sort { uc( $ResponseChangeDefaultToData{$a} ) cmp
-                   uc( $ResponseChangeDefaultToData{$b} ) }
-            keys %ResponseChangeDefaultToData
+            sort { uc( $DefaultToData{$a} ) cmp uc( $DefaultToData{$b} ) }
+            keys %DefaultToData
             )
         {
 
@@ -335,8 +329,8 @@ sub _Overview {
             $Self->{LayoutObject}->Block(
                 Name => 'Listn1',
                 Data => {
-                    Name      => $ResponseChangeDefaultToData{$ID},
-                    Subaction => 'ResponseChangeDefaultTo',
+                    Name      => $DefaultToData{$ID},
+                    Subaction => 'DefaultTo',
                     ID        => $ID,
                 },
             );
@@ -346,14 +340,14 @@ sub _Overview {
     # otherwise it displays a no data found message
     else {
         $Self->{LayoutObject}->Block(
-            Name => 'NoResponseChangeDefaultToFoundMsg',
+            Name => 'NoDefaultToFoundMsg',
             Data => {},
         );
     }
 
     # return output
     return $Self->{LayoutObject}->Output(
-        TemplateFile => 'AdminResponseChangeDefaultToTemplates',
+        TemplateFile => 'AdminDefaultToTemplates',
         Data         => \%Param,
     );
 }

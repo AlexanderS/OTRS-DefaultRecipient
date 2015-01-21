@@ -1,16 +1,16 @@
 # --
-# Kernel/Output/HTML/ResponseChangeDefaultTo.pm
+# Kernel/Output/HTML/DefaultTo.pm
 # Copyright (C) 2015 Alexander Sulfrian <alex@spline.inf.fu-berlin.de>
 # --
 
-package Kernel::Output::HTML::ResponseChangeDefaultTo;
+package Kernel::Output::HTML::DefaultTo;
 
 use strict;
 use warnings;
 
 our @ObjectDependencies = qw(
     Kernel::System::Log
-    Kernel::System::ResponseChangeDefaultTo
+    Kernel::System::DefaultTo
 );
 
 sub new {
@@ -20,8 +20,7 @@ sub new {
     my $Self = {};
     $Self->{LayoutObject} = $Param{LayoutObject} || die "Got no LayoutObject!";
     $Self->{LogObject} = $Kernel::OM->Get('Kernel::System::Log');
-    $Self->{ResponseChangeDefaultToObject} =
-        $Kernel::OM->Get('Kernel::System::ResponseChangeDefaultTo');
+    $Self->{DefaultToObject} = $Kernel::OM->Get('Kernel::System::DefaultTo');
     bless( $Self, $Type );
 
     return $Self;
@@ -31,7 +30,7 @@ sub Run {
     my ( $Self, %Param ) = @_;
     return if !$Self->{LayoutObject};
 
-    for (qw(LogObject LayoutObject ResponseChangeDefaultToObject)) {
+    for (qw(LogObject LayoutObject DefaultToObject)) {
         return if !$Self->{$_};
     }
 
@@ -57,25 +56,23 @@ sub Run {
     } 
 
     # return if not generated from template
-    return unless $Ticket->{ResponseID};
+    return unless $Ticket->{TemplateID};
 
-    # get all ResponseChangeDefaultTo
-    my %MappedResponseChangeDefaultTo =
-        $Self->{ResponseChangeDefaultToObject}->MappingList(
-            ResponseID => $Ticket->{ResponseID},
-        );
+    # get all DefaultTo
+    my %MappedDefaultTo = $Self->{DefaultToObject}->MappingList(
+        TemplateID => $Ticket->{TemplateID},
+    );
 
     my $RemoveDefault = 0;
     my @Addresses = ();
-    foreach my $ID ( values %MappedResponseChangeDefaultTo ) {
-        my %ResponseChangeDefaultTo =
-            $Self->{ResponseChangeDefaultToObject}->Get(
-                ID => $ID,
-            );
+    foreach my $ID ( values %MappedDefaultTo ) {
+        my %DefaultTo = $Self->{DefaultToObject}->Get(
+            ID => $ID,
+        );
 
-        $RemoveDefault = 1 if $ResponseChangeDefaultTo{RemoveDefault};
-        if ( $ResponseChangeDefaultTo{AddNew} ) {
-            push @Addresses, $ResponseChangeDefaultTo{NewAddress};
+        $RemoveDefault = 1 if $DefaultTo{RemoveDefault};
+        if ( $DefaultTo{AddNew} ) {
+            push @Addresses, $DefaultTo{NewAddress};
         }
     }
 
