@@ -201,6 +201,27 @@ sub List {
     return %DefaultTo;
 }
 
+sub TitleExistsCheck {
+    my ( $Self, %Param ) = @_;
+
+    return if !$Self->{DBObject}->Prepare(
+        SQL  => 'SELECT id FROM default_to WHERE title = ?',
+        Bind => [ \$Param{Title} ],
+    );
+
+    # fetch the result
+    my $Flag;
+    while ( my @Row = $Self->{DBObject}->FetchrowArray() ) {
+        if ( !$Param{ID} || $Param{ID} ne $Row[0] ) {
+            $Flag = 1;
+        }
+    }
+    if ($Flag) {
+        return 1;
+    }
+    return 0;
+}
+
 sub MappingAdd {
     my ( $Self, %Param ) = @_;
 
