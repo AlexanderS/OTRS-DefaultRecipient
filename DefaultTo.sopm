@@ -24,6 +24,11 @@
       <Column Name="remove_default" Required="true" Type="SMALLINT"/>
       <Column Name="add_new" Required="true" Type="SMALLINT"/>
       <Column Name="new_address" Required="false" Size="255" Type="VARCHAR"/>
+      <Column Name="comments" Required="false" Size="250" Type="VARCHAR"/>
+      <Column Name="create_time" Required="true" Type="DATE"/>
+      <Column Name="create_by" Required="true" Type="INTEGER"/>
+      <Column Name="change_time" Required="true" Type="DATE"/>
+      <Column Name="change_by" Required="true" Type="INTEGER"/>
       <Index Name="default_to_title">
         <IndexColumn Name="title"/>
       </Index>

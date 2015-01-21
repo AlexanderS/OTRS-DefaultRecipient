@@ -36,7 +36,8 @@ sub Add {
     my ( $Self, %Param ) = @_;
 
     # check needed stuff
-    for my $Needed (qw(Title RemoveDefault AddNew NewAddress)) {
+    for my $Needed (qw(Title RemoveDefault AddNew NewAddress Comment
+                       UserID)) {
         if ( !$Param{$Needed} ) {
             $Self->{LogObject}->Log(
                 Priority => 'error',
@@ -49,13 +50,17 @@ sub Add {
     # insert new DefaultTo
     return if !$Self->{DBObject}->Do(
         SQL => 'INSERT INTO default_to '
-             . '(title, remove_default, add_new, new_address) '
-             . 'VALUES (?, ?, ?, ?)',
+             . '(title, remove_default, add_new, new_address, comments, '
+             . ' create_time, create_by, change_time, change_by) '
+             . 'VALUES (?, ?, ?, ?, ?, current_timestamp, ?, current_timestamp, ?)',
         Bind => [
             \$Param{Title},
             \$Param{RemoveDefault},
             \$Param{AddNew},
             \$Param{NewAddress},
+            \$Param{Comment},
+            \$Param{UserID},
+            \$Param{UserID},
         ],
     );
 
@@ -84,7 +89,8 @@ sub Update {
     my ( $Self, %Param ) = @_;
 
     # check needed stuff
-    for my $Needed (qw(ID Title RemoveDefault AddNew NewAddress)) {
+    for my $Needed (qw(ID Title RemoveDefault AddNew NewAddress Comment
+                       UserID)) {
         if ( !$Param{$Needed} ) {
             $Self->{LogObject}->Log(
                 Priority => 'error',
@@ -96,14 +102,17 @@ sub Update {
 
     # insert new DefaultTo
     return if !$Self->{DBObject}->Do(
-        SQL => 'UPDATE default_to SET title = ?, '
-             . 'remove_default = ?, add_new = ?, new_address = ? '
+        SQL => 'UPDATE default_to SET title = ?, remove_default = ?, '
+             . 'add_new = ?, new_address = ?, comments = ?, change_by = ? '
+             . 'change_time = current_timestamp '
              . 'WHERE id = ?',
         Bind => [
             \$Param{Title},
             \$Param{RemoveDefault},
             \$Param{AddNew},
             \$Param{NewAddress},
+            \$Param{Comment},
+            \$Param{UserID},
             \$Param{ID},
         ],
     );
@@ -125,7 +134,8 @@ sub Get {
 
     # get RrsponseChangeDefaultTO obejct
     return if !$Self->{DBObject}->Prepare(
-        SQL => 'SELECT id, title, remove_default, add_new, new_address '
+        SQL => 'SELECT id, title, remove_default, add_new, new_address, '
+             . 'comments, create_time, create_by, change_time, change_by '
              . 'FROM default_to WHERE id = ?',
         Bind  => [ \$Param{ID} ],
         Limit => 1,
@@ -139,6 +149,11 @@ sub Get {
             RemoveDefault => $Data[2],
             AddNew        => $Data[3],
             NewAddress    => $Data[4],
+            Comment       => $Data[5],
+            CreateTime    => $Data[6],
+            CreateBy      => $Data[7],
+            ChangeTime    => $Data[8],
+            ChangeBy      => $Data[9],
         );
     }
 
