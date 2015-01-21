@@ -292,25 +292,6 @@ sub MappingList {
         return;
     }
 
-    my %Mapping;
-
-    if ( $Param{All} ) {
-        # get list all all objects
-        my %List;
-        if ( $Param{ResponseID} ) {
-            %List = $Self->List();
-        }
-        else {
-            %List = $Self->{StandardTemplateObject}->StandardTemplateList();
-        }
-
-        foreach ( keys %List ) {
-            $Mapping{$_} = {
-                Title => $List{$_},
-            };
-        }
-    }
-
     # find mapped objects
     if ( $Param{ResponseID} ) {
         $Self->{DBObject}->Prepare(
@@ -329,6 +310,7 @@ sub MappingList {
         );
     }
 
+    my %Mapping;
     while ( my @Data = $Self->{DBObject}->FetchrowArray() ) {
         $Mapping{ $Data[0] }->{MappingID} = $Data[1];
     }
