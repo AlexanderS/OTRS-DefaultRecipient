@@ -142,31 +142,6 @@ sub Get {
         );
     }
 
-    # make sure we have a valid object
-    return unless %DefaultTo;
-
-    # get the assigned responses
-    return if !$Self->{DBObject}->Prepare(
-        SQL => 'SELECT id, response_id '
-             . 'FROM response_change_default_to_response '
-             . 'WHERE response_change_default_to_id = ?',
-        Bind => [ \$DefaultTo{ID} ],
-    );
-
-    while ( my @Data = $Self->{DBObject}->FetchrowArray() ) {
-        my $Response =
-            $Self->{StandardTemplateObject}->StandardTemplateLookup(
-                StandardTemplateID => $Data[1],
-            );
-
-        if ( $Response ) {
-            $DefaultTo{Responses}->{$Data[0]} = {
-                ID => $Data[1],
-                Name => $Response,
-            };
-        }        
-    }
-
     return %DefaultTo;
 }
 
