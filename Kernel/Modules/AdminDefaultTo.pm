@@ -258,6 +258,7 @@ sub Run {
 
 sub _Edit {
     my ( $Self, %Param ) = @_;
+    $Param{Errors} = {} unless defined $Param{Errors};
 
     $Self->{LayoutObject}->Block(
         Name => 'Overview',
