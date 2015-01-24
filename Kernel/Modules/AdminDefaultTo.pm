@@ -76,7 +76,7 @@ sub Run {
         }
 
         # check needed data
-        $Errors{ 'TitleInvalid' } = 'ServerError' if !$GetParam{Title};
+        $Errors{TitleInvalid} = 'ServerError' if !$GetParam{Title};
 
         # check if a DefaultTo entry exist with this title
         my $TitleExists = $Self->{DefaultToObject}->TitleExistsCheck(
@@ -86,7 +86,7 @@ sub Run {
 
         if ($TitleExists) {
             $Errors{TitleExists} = 1;
-            $Errors{'TitleInvalid'} = 'ServerError';
+            $Errors{TitleInvalid} = 'ServerError';
         }
 
         # if no errors occurred
@@ -166,13 +166,13 @@ sub Run {
         }
 
         # check needed data
-        $Errors{ 'TitleInvalid' } = 'ServerError' if !$GetParam{Title};
+        $Errors{TitleInvalid} = 'ServerError' if !$GetParam{Title};
         
         # check if a DefaultTo entry exists with this title
         my $TitleExists = $Self->{DefaultToObject}->TitleExistsCheck( Title => $GetParam{Title} );
         if ($TitleExists) {
             $Errors{TitleExists} = 1;
-            $Errors{'TitleInvalid'} = 'ServerError';
+            $Errors{TitleInvalid} = 'ServerError';
         }
 
         # if no errors occurred
