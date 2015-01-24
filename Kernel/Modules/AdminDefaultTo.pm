@@ -12,7 +12,13 @@ package Kernel::Modules::AdminDefaultTo;
 use strict;
 use warnings;
 
-use Kernel::System::DefaultTo;
+our @ObjectDependencies = qw(
+    Kernel::Config
+    Kernel::Output::HTML::Layout
+    Kernel::System::DB
+    Kernel::System::Web::Request
+    Kernel::System::DefaultTo
+);
 
 sub new {
     my ( $Type, %Param ) = @_;
@@ -22,12 +28,11 @@ sub new {
     bless( $Self, $Type );
 
     # check all needed objects
-    for my $Needed (qw(ParamObject DBObject LayoutObject ConfigObject LogObject)) {
+    for my $Needed (qw(ParamObject DBObject LayoutObject ConfigObject)) {
         if ( !$Self->{$Needed} ) {
             $Self->{LayoutObject}->FatalError( Message => "Got no $Needed!" );
         }
     }
-    $Self->{DefaultToObject} = Kernel::System::DefaultTo->new(%Param);
 
     return $Self;
 }
@@ -40,7 +45,8 @@ sub Run {
     # ------------------------------------------------------------ #
     if ( $Self->{Subaction} eq 'Change' ) {
         my $ID = $Self->{ParamObject}->GetParam( Param => 'ID' ) || '';
-        my %Data = $Self->{DefaultToObject}->Get(
+        my $DefaultToObject = $Kernel::OM->Get('Kernel::System::DefaultTo');
+        my %Data = $DefaultToObject->Get(
             ID => $ID,
         );
 
@@ -62,10 +68,10 @@ sub Run {
     # change action
     # ------------------------------------------------------------ #
     elsif ( $Self->{Subaction} eq 'ChangeAction' ) {
-
         # challenge token check for write action
         $Self->{LayoutObject}->ChallengeTokenCheck();
 
+        my $DefaultToObject = $Kernel::OM->Get('Kernel::System::DefaultTo');
         my @NewIDs = $Self->{ParamObject}->GetArray( Param => 'IDs' );
         my ( %GetParam, %Errors );
         for my $Parameter (qw(ID Title RemoveDefault AddNew NewAddress
@@ -79,7 +85,7 @@ sub Run {
         $Errors{TitleInvalid} = 'ServerError' if !$GetParam{Title};
 
         # check if a DefaultTo entry exist with this title
-        my $TitleExists = $Self->{DefaultToObject}->TitleExistsCheck(
+        my $TitleExists = $DefaultToObject->TitleExistsCheck(
             Title => $GetParam{Title},
             ID    => $GetParam{ID}
         );
@@ -92,7 +98,7 @@ sub Run {
         # if no errors occurred
         if ( !%Errors ) {
 
-            if ( $Self->{DefaultToObject}->Update(
+            if ( $DefaultToObject->Update(
                      %GetParam,
                      UserID => $Self->{UserID},
                  )
@@ -153,10 +159,10 @@ sub Run {
     # add action
     # ------------------------------------------------------------ #
     elsif ( $Self->{Subaction} eq 'AddAction' ) {
-
         # challenge token check for write action
         $Self->{LayoutObject}->ChallengeTokenCheck();
 
+        my $DefaultToObject = $Kernel::OM->Get('Kernel::System::DefaultTo');
         my @NewIDs = $Self->{ParamObject}->GetArray( Param => 'IDs' );
         my ( %GetParam, %Errors );
 
@@ -169,7 +175,7 @@ sub Run {
         $Errors{TitleInvalid} = 'ServerError' if !$GetParam{Title};
         
         # check if a DefaultTo entry exists with this title
-        my $TitleExists = $Self->{DefaultToObject}->TitleExistsCheck( Title => $GetParam{Title} );
+        my $TitleExists = $DefaultToObject->TitleExistsCheck( Title => $GetParam{Title} );
         if ($TitleExists) {
             $Errors{TitleExists} = 1;
             $Errors{TitleInvalid} = 'ServerError';
@@ -179,7 +185,7 @@ sub Run {
         if ( !%Errors ) {
 
             # add DefaultTo entry
-            my $ID = $Self->{DefaultToObject}->Add(
+            my $ID = $DefaultToObject->Add(
                 %GetParam,
                 UserID => $Self->{UserID},
             );
@@ -219,13 +225,13 @@ sub Run {
     # delete action
     # ------------------------------------------------------------ #
     elsif ( $Self->{Subaction} eq 'Delete' ) {
-
         # challenge token check for write action
         $Self->{LayoutObject}->ChallengeTokenCheck();
 
+        my $DefaultToObject = $Kernel::OM->Get('Kernel::System::DefaultTo');
         my $ID = $Self->{ParamObject}->GetParam( Param => 'ID' );
 
-        my $Delete = $Self->{DefaultToObject}->Delete(
+        my $Delete = $DefaultToObject->Delete(
             ID => $ID,
         );
         if ( !$Delete ) {
@@ -321,11 +327,13 @@ sub _Overview {
         Name => 'OverviewResult',
         Data => \%Param,
     );
-    my %List = $Self->{DefaultToObject}->List();
+
+    my $DefaultToObject = $Kernel::OM->Get('Kernel::System::DefaultTo');
+    my %List = $DefaultToObject->List();
 
     for my $ID ( sort { $List{$a} cmp $List{$b} } keys %List )
     {
-        my %DefaultTo = $Self->{DefaultToObject}->Get(
+        my %DefaultTo = $DefaultToObject->Get(
             ID => $ID,
         );
 

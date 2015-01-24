@@ -12,8 +12,13 @@ package Kernel::Modules::AdminDefaultToTemplates;
 use strict;
 use warnings;
 
-use Kernel::System::DefaultTo;
-use Kernel::System::StandardTemplate;
+our @ObjectDependencies = qw(
+    Kernel::Output::HTML::Layout
+    Kernel::System::DB
+    Kernel::System::DefaultTo
+    Kernel::System::StandardTemplate
+    Kernel::System::Web::Request
+);
 
 sub new {
     my ( $Type, %Param ) = @_;
@@ -23,15 +28,11 @@ sub new {
     bless( $Self, $Type );
 
     # check all needed objects
-    for (qw(ParamObject DBObject QueueObject LayoutObject ConfigObject LogObject)) {
+    for (qw(ParamObject DBObject LayoutObject)) {
         if ( !$Self->{$_} ) {
             $Self->{LayoutObject}->FatalError( Message => "Got no $_!" );
         }
     }
-
-    $Self->{DefaultToObject} = Kernel::System::DefaultTo->new(%Param);
-    $Self->{StandardTemplateObject} =
-        Kernel::System::StandardTemplate->new(%Param);
 
     return $Self;
 }
@@ -46,15 +47,17 @@ sub Run {
 
         # get template data
         my $ID = $Self->{ParamObject}->GetParam( Param => 'ID' );
-        my %StandardTemplateData = $Self->{StandardTemplateObject}->StandardTemplateGet( ID => $ID );
+        my $StandardTemplateObject = $Kernel::OM->Get('Kernel::System::StandardTemplate');
+        my %StandardTemplateData = $StandardTemplateObject->StandardTemplateGet( ID => $ID );
         my $StandardTemplateType = $Self->{LayoutObject}->{LanguageObject}->Translate(
             $StandardTemplateData{TemplateType},
         );
         my $Name = $StandardTemplateType . ' - ' . $StandardTemplateData{Name};
 
         # get DefaultTo data
-        my %DefaultToData = $Self->{DefaultToObject}->List();
-        my %Member = $Self->{DefaultToObject}->MappingList(
+        my $DefaultToObject = $Kernel::OM->Get('Kernel::System::DefaultTo');
+        my %DefaultToData = $DefaultToObject->List();
+        my %Member = $DefaultToObject->MappingList(
             TemplateID => $ID,
         );
 
@@ -77,16 +80,18 @@ sub Run {
     elsif ( $Self->{Subaction} eq 'DefaultTo' ) {
 
         my $ID = $Self->{ParamObject}->GetParam( Param => 'ID' );
-        my %DefaultToData = $Self->{DefaultToObject}->Get( ID => $ID );
+        my $DefaultToObject = $Kernel::OM->Get('Kernel::System::DefaultTo');
+        my %DefaultToData = $DefaultToObject->Get( ID => $ID );
 
         # get templates
-        my %StandardTemplateData = $Self->{StandardTemplateObject}->StandardTemplateList(
+        my $StandardTemplateObject = $Kernel::OM->Get('Kernel::System::StandardTemplate');
+        my %StandardTemplateData = $StandardTemplateObject->StandardTemplateList(
             Valid => 1,
         );
 
         if (%StandardTemplateData) {
             for my $StandardTemplateID ( sort keys %StandardTemplateData ) {
-                my %Data = $Self->{StandardTemplateObject}->StandardTemplateGet(
+                my %Data = $StandardTemplateObject->StandardTemplateGet(
                     ID => $StandardTemplateID
                 );
                 $StandardTemplateData{$StandardTemplateID}
@@ -97,7 +102,7 @@ sub Run {
         }
 
         # get assigned templates
-        my %Member = $Self->{DefaultToObject}->MappingList(
+        my %Member = $DefaultToObject->MappingList(
             DefaultToID => $ID,
         );
 
@@ -124,7 +129,8 @@ sub Run {
 
         # get current mapping
         my $ID = $Self->{ParamObject}->GetParam( Param => 'ID' );
-        my %Mapping = $Self->{DefaultToObject}->MappingList(
+        my $DefaultToObject = $Kernel::OM->Get('Kernel::System::DefaultTo');
+        my %Mapping = $DefaultToObject->MappingList(
             DefaultToID => $ID,
         );
 
@@ -139,7 +145,7 @@ sub Run {
         for my $TemplateID (@TemplatesAll) {
             if ( $TemplatesSelected{$TemplateID} ) {
                 if ( ! $Mapping{$TemplateID} ) {
-                    $Self->{DefaultToObject}->MappingAdd(
+                    $DefaultToObject->MappingAdd(
                         TemplateID => $TemplateID,
                         DefaultToID => $ID,
                     );
@@ -147,7 +153,7 @@ sub Run {
             }
             else {
                 if ( $Mapping{$TemplateID} ) {
-                    $Self->{DefaultToObject}->MappingDelete(
+                    $DefaultToObject->MappingDelete(
                         ID => $Mapping{$TemplateID},
                     );
                 }
@@ -167,7 +173,8 @@ sub Run {
 
         # get current mapping
         my $ID = $Self->{ParamObject}->GetParam( Param => 'ID' );
-        my %Mapping = $Self->{DefaultToObject}->MappingList(
+        my $DefaultToObject = $Kernel::OM->Get('Kernel::System::DefaultTo');
+        my %Mapping = $DefaultToObject->MappingList(
             TemplateID => $ID,
         );
 
@@ -182,7 +189,7 @@ sub Run {
         for my $DefaultToID (@All) {
             if ( $Selected{$DefaultToID} ) {
                 if ( ! $Mapping{$DefaultToID} ) {
-                    $Self->{DefaultToObject}->MappingAdd(
+                    $DefaultToObject->MappingAdd(
                         TemplateID => $ID,
                         DefaultToID => $DefaultToID,
                     );
@@ -190,7 +197,7 @@ sub Run {
             }
             else {
                 if ( $Mapping{$DefaultToID} ) {
-                    $Self->{DefaultToObject}->MappingDelete(
+                    $DefaultToObject->MappingDelete(
                         ID => $Mapping{$DefaultToID},
                     );
                 }
@@ -273,14 +280,15 @@ sub _Overview {
     $Self->{LayoutObject}->Block( Name => 'OverviewResult' );
 
     # get std template list
-    my %StandardTemplateData = $Self->{StandardTemplateObject}->StandardTemplateList(
+    my $StandardTemplateObject = $Kernel::OM->Get('Kernel::System::StandardTemplate');
+    my %StandardTemplateData = $StandardTemplateObject->StandardTemplateList(
         Valid => 1,
     );
 
     # if there are results to show
     if (%StandardTemplateData) {
         for my $StandardTemplateID ( sort keys %StandardTemplateData ) {
-            my %Data = $Self->{StandardTemplateObject}->StandardTemplateGet(
+            my %Data = $StandardTemplateObject->StandardTemplateGet(
                 ID => $StandardTemplateID,
             );
             $StandardTemplateData{$StandardTemplateID}
@@ -315,7 +323,8 @@ sub _Overview {
     }
 
     # get queue data
-    my %DefaultToData = $Self->{DefaultToObject}->List();
+    my $DefaultToObject = $Kernel::OM->Get('Kernel::System::DefaultTo');
+    my %DefaultToData = $DefaultToObject->List();
 
     # if there are results to show
     if (%DefaultToData) {

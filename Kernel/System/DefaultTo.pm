@@ -15,7 +15,6 @@ use warnings;
 our @ObjectDependencies = qw(
     Kernel::System::DB
     Kernel::System::Log
-    Kernel::System::StandardTemplate
 );
 
 sub new {
@@ -23,10 +22,6 @@ sub new {
 
     # allocate new hash for object
     my $Self = {};
-    $Self->{DBObject} = $Kernel::OM->Get('Kernel::System::DB');
-    $Self->{LogObject} = $Kernel::OM->Get('Kernel::System::Log');
-    $Self->{StandardTemplateObject} =
-        $Kernel::OM->Get('Kernel::System::StandardTemplate');
     bless ($Self, $Type);
 
     return $Self;
@@ -36,10 +31,10 @@ sub Add {
     my ( $Self, %Param ) = @_;
 
     # check needed stuff
-    for my $Needed (qw(Title RemoveDefault AddNew NewAddress Comment
-                       UserID)) {
-        if ( !$Param{$Needed} ) {
-            $Self->{LogObject}->Log(
+    for my $Needed (qw(Title RemoveDefault AddNew NewAddress Comment UserID)) {
+        if ( ! defined $Param{$Needed} ) {
+            my $LogObject = $Kernel::OM->Get('Kernel::System::Log');
+            $LogObject->Log(
                 Priority => 'error',
                 Message  => "Need $Needed!",
             );
@@ -47,8 +42,10 @@ sub Add {
         }
     }
 
+    my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
+
     # insert new DefaultTo
-    return if !$Self->{DBObject}->Do(
+    return if !$DBObject->Do(
         SQL => 'INSERT INTO default_to '
              . '(title, remove_default, add_new, new_address, comments, '
              . ' create_time, create_by, change_time, change_by) '
@@ -65,19 +62,20 @@ sub Add {
     );
 
     # get new id
-    return if !$Self->{DBObject}->Prepare(
+    return if !$DBObject->Prepare(
         SQL   => 'SELECT MAX(id) FROM default_to WHERE title = ?',
         Bind  => [ \$Param{Title}, ],
         Limit => 1,
     );
 
     my $ID;
-    while ( my @Row = $Self->{DBObject}->FetchrowArray() ) {
+    while ( my @Row = $DBObject->FetchrowArray() ) {
         $ID = $Row[0];
     }
 
     # log notice
-    $Self->{LogObject}->Log(
+    my $LogObject = $Kernel::OM->Get('Kernel::System::Log');
+    $LogObject->Log(
         Priority => 'notice',
         Message  => "DefaultTo '$ID' created successfully!",
     );
@@ -91,8 +89,9 @@ sub Update {
     # check needed stuff
     for my $Needed (qw(ID Title RemoveDefault AddNew NewAddress Comment
                        UserID)) {
-        if ( !$Param{$Needed} ) {
-            $Self->{LogObject}->Log(
+        if ( ! defined $Param{$Needed} ) {
+            my $LogObject = $Kernel::OM->Get('Kernel::System::Log');
+            $LogObject->Log(
                 Priority => 'error',
                 Message  => "Need $Needed!",
             );
@@ -100,8 +99,10 @@ sub Update {
         }
     }
 
+    my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
+
     # insert new DefaultTo
-    return if !$Self->{DBObject}->Do(
+    return if !$DBObject->Do(
         SQL => 'UPDATE default_to SET title = ?, remove_default = ?, '
              . 'add_new = ?, new_address = ?, comments = ?, change_by = ?, '
              . 'change_time = current_timestamp '
@@ -125,15 +126,18 @@ sub Get {
 
     # check needed stuff
     if ( !$Param{ID} ) {
-        $Self->{LogObject}->Log(
+        my $LogObject = $Kernel::OM->Get('Kernel::System::Log');
+        $LogObject->Log(
             Priority => 'error',
             Message  => 'Need ID!',
         );
         return;
     }
 
+    my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
+
     # get RrsponseChangeDefaultTO obejct
-    return if !$Self->{DBObject}->Prepare(
+    return if !$DBObject->Prepare(
         SQL => 'SELECT id, title, remove_default, add_new, new_address, '
              . 'comments, create_time, create_by, change_time, change_by '
              . 'FROM default_to WHERE id = ?',
@@ -142,7 +146,7 @@ sub Get {
     );
 
     my %DefaultTo;
-    while ( my @Data = $Self->{DBObject}->FetchrowArray() ) {
+    while ( my @Data = $DBObject->FetchrowArray() ) {
         %DefaultTo = (
             ID            => $Data[0],
             Title         => $Data[1],
@@ -165,22 +169,25 @@ sub Delete {
 
     # check needed stuff
     if ( !$Param{ID} ) {
-        $Self->{LogObject}->Log(
+        my $LogObject = $Kernel::OM->Get('Kernel::System::Log');
+        $LogObject->Log(
             Priority => 'error',
             Message  => 'Need ID!',
         );
         return;
     }
 
+    my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
+
     # delete mapping
-    return if !$Self->{DBObject}->Do(
+    return if !$DBObject->Do(
         SQL => 'DELETE FROM default_to_response '
              . 'WHERE default_to_id = ?',
         Bind => [ \$Param{ID} ],
     );
 
     # delete entry
-    return $Self->{DBObject}->Do(
+    return $DBObject->Do(
         SQL => 'DELETE FROM default_to WHERE id = ?',
         Bind  => [ \$Param{ID} ],
     );
@@ -188,13 +195,14 @@ sub Delete {
 
 sub List {
     my ( $Self, %Param ) = @_;
+    my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
 
-    $Self->{DBObject}->Prepare(
+    $DBObject->Prepare(
         SQL => 'SELECT id, title FROM default_to',
     );
 
     my %DefaultTo;
-    while ( my @Data = $Self->{DBObject}->FetchrowArray() ) {
+    while ( my @Data = $DBObject->FetchrowArray() ) {
         $DefaultTo{ $Data[0] } = $Data[1];
     }
 
@@ -203,15 +211,16 @@ sub List {
 
 sub TitleExistsCheck {
     my ( $Self, %Param ) = @_;
+    my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
 
-    return if !$Self->{DBObject}->Prepare(
+    return if !$DBObject->Prepare(
         SQL  => 'SELECT id FROM default_to WHERE title = ?',
         Bind => [ \$Param{Title} ],
     );
 
     # fetch the result
     my $Flag;
-    while ( my @Row = $Self->{DBObject}->FetchrowArray() ) {
+    while ( my @Row = $DBObject->FetchrowArray() ) {
         if ( !$Param{ID} || $Param{ID} ne $Row[0] ) {
             $Flag = 1;
         }
@@ -228,7 +237,8 @@ sub MappingAdd {
     # check needed stuff
     for my $Needed (qw(TemplateID DefaultToID)) {
         if ( !$Param{$Needed} ) {
-            $Self->{LogObject}->Log(
+            my $LogObject = $Kernel::OM->Get('Kernel::System::Log');
+            $LogObject->Log(
                 Priority => 'error',
                 Message  => "Need $Needed!",
             );
@@ -236,8 +246,10 @@ sub MappingAdd {
         }
     }
 
+    my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
+
     # insert new mapping
-    return if !$Self->{DBObject}->Do(
+    return if !$DBObject->Do(
         SQL => 'INSERT INTO default_to_response '
              . '(template_id, default_to_id) VALUES (?, ?)',
         Bind => [
@@ -247,7 +259,7 @@ sub MappingAdd {
     );
 
     # get new id
-    return if !$Self->{DBObject}->Prepare(
+    return if !$DBObject->Prepare(
         SQL   => 'SELECT MAX(id) FROM default_to_response '
                . 'WHERE template_id = ? AND default_to_id = ?',
         Bind  => [
@@ -257,12 +269,13 @@ sub MappingAdd {
     );
 
     my $ID;
-    while ( my @Row = $Self->{DBObject}->FetchrowArray() ) {
+    while ( my @Row = $DBObject->FetchrowArray() ) {
         $ID = $Row[0];
     }
 
     # log notice
-    $Self->{LogObject}->Log(
+    my $LogObject = $Kernel::OM->Get('Kernel::System::Log');
+    $LogObject->Log(
         Priority => 'notice',
         Message  => "DefaultTo mapping '$ID' "
                   . "created successfully!",
@@ -276,15 +289,18 @@ sub MappingDelete {
 
     # check needed stuff
     if ( !$Param{ID} ) {
-        $Self->{LogObject}->Log(
+        my $LogObject = $Kernel::OM->Get('Kernel::System::Log');
+        $LogObject->Log(
             Priority => 'error',
             Message  => 'Need ID!',
         );
         return;
     }
 
+    my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
+
     # delete mapping
-    return $Self->{DBObject}->Do(
+    return $DBObject->Do(
         SQL => 'DELETE FROM default_to_response '
              . 'WHERE id = ?',
         Bind => [ \$Param{ID} ],
@@ -296,16 +312,19 @@ sub MappingList {
 
      # check needed stuff
     if ( !$Param{TemplateID} && !$Param{DefaultToID} ) {
-        $Self->{LogObject}->Log(
+        my $LogObject = $Kernel::OM->Get('Kernel::System::Log');
+        $LogObject->Log(
             Priority => 'error',
             Message  => 'Got no TemplateID or DefaultToID!'
         );
         return;
     }
 
+    my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
+
     # find mapped objects
     if ( $Param{TemplateID} ) {
-        $Self->{DBObject}->Prepare(
+        $DBObject->Prepare(
             SQL => 'SELECT id, default_to_id '
                  . 'FROM default_to_response '
                  . 'WHERE template_id = ?',
@@ -313,7 +332,7 @@ sub MappingList {
         );
     }
     else {
-        $Self->{DBObject}->Prepare(
+        $DBObject->Prepare(
             SQL => 'SELECT id, template_id '
                  . 'FROM default_to_response '
                  . 'WHERE default_to_id = ?',
@@ -322,7 +341,7 @@ sub MappingList {
     }
 
     my %Mapping;
-    while ( my @Data = $Self->{DBObject}->FetchrowArray() ) {
+    while ( my @Data = $DBObject->FetchrowArray() ) {
         $Mapping{ $Data[0] } = $Data[1];
     }
 
