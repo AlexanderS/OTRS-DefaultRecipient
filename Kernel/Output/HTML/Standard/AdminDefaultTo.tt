@@ -93,7 +93,7 @@
 [% RenderBlockStart("OverviewResultRow") %]
                         <tr>
                             <td>
-                                <a class="AsBlock" href="[% Env("Baselink") %]Action=[% Env("Action") %];Subaction=Change;ID=[% Data.ID | uri %]">[% Data.Name | html %]</a>
+                                <a class="AsBlock" href="[% Env("Baselink") %]Action=[% Env("Action") %];Subaction=Change;ID=[% Data.ID | uri %]">[% Data.Title | html %]</a>
                             </td>
                             <td>[% Translate(Data.RemoveDefault) | html %]</td>
                             <td>[% Translate(Data.AddNew) | html %]</td>
@@ -136,13 +136,13 @@
                     <input type="hidden" name="Subaction" value="[% Data.Action | uri %]Action"/>
                     <input type="hidden" name="ID" value="[% Data.ID | html %]"/>
                     <fieldset class="TableLike">
-                        <label class="Mandatory" for="TemplateType"><span class="Marker">*</span> [% Translate("Title") | html %]:</label>
+                        <label class="Mandatory" for="Title"><span class="Marker">*</span> [% Translate("Title") | html %]:</label>
                         <div class="Field">
-                            <input type="text" name="Title" id="Title" value="[% Data.Title | html %]" class="W50pc Validate_Required [% Date.TitleInvalid | html %]" maxlength="200"/>
-                            <div id="DefaultToTitleError" class="TooltipErrorMessage">
+                            <input type="text" name="Title" id="Title" value="[% Data.Title | html %]" class="W50pc Validate_Required [% Data.TitleInvalid | html %]" maxlength="200"/>
+                            <div id="TitleError" class="TooltipErrorMessage">
                                 <p>[% Translate("This field is required.") | html %]</p>
                             </div>
-                            <div id="DefaultToTitleServerError" class="TooltipErrorMessage">
+                            <div id="TitleServerError" class="TooltipErrorMessage">
 [% RenderBlockStart("TitleServerError") %]
                                 <p>[% Translate("This field is required.") | html %]</p>
 [% RenderBlockEnd("TitleServerError") %]
@@ -153,19 +153,19 @@
                         </div>
                         <div class="Clear"></div>
 
-                        <label for="Name">[% Translate("Remove default") | html %]:</label>
+                        <label for="RemoveDefault">[% Translate("Remove default") | html %]:</label>
                         <div class="Field">
                             [% Data.DefaultToRemoveDefaultOption %]
                         </div>
                         <div class="Clear"></div>
 
-                        <label for="Nane">[% Translate("Add new") | html %]:</label>
+                        <label for="AddNew">[% Translate("Add new") | html %]:</label>
                         <div class="Field">
                             [% Data.DefaultToAddNewOption %]
                         </div>
                         <div class="Clear"></div>
 
-                        <label for="Name">[% Translate("New address") | html %]:</label>
+                        <label for="NewAddress">[% Translate("New address") | html %]:</label>
                         <div class="Field">
                             <input type="text" name="NewAddress" id="NewAddress" value="[% Data.NewAddress | html %]" class="W50pc" maxlength="200"/>
                         </div>
