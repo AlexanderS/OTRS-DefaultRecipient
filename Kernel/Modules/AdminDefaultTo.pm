@@ -1,5 +1,5 @@
 # --
-# Kernel/Modules/AdminTemplate.pm - provides admin DefaultTo module
+# Kernel/Modules/AdminDefaultTo.pm - provides admin DefaultTo module
 # Copyright (C) 2015 Alexander Sulfrian <alex@spline.inf.fu-berlin.de>
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
@@ -7,7 +7,7 @@
 # did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
 # --
 
-package Kernel::Modules::AdminTemplate;
+package Kernel::Modules::AdminDefaultTo;
 
 use strict;
 use warnings;
@@ -179,7 +179,7 @@ sub Run {
         if ( !%Errors ) {
 
             # add DefaultTo entry
-            my $ID = $Self->{DefaultToObject}->Add
+            my $ID = $Self->{DefaultToObject}->Add(
                 %GetParam,
                 UserID => $Self->{UserID},
             );
@@ -338,7 +338,7 @@ sub _Overview {
     }
 
     # otherwise it displays a no data found message
-    else {
+    if ( ! %List ) {
         $Self->{LayoutObject}->Block(
             Name => 'NoDataFoundMsg',
             Data => {},

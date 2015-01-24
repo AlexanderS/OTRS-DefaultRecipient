@@ -103,7 +103,7 @@ sub Update {
     # insert new DefaultTo
     return if !$Self->{DBObject}->Do(
         SQL => 'UPDATE default_to SET title = ?, remove_default = ?, '
-             . 'add_new = ?, new_address = ?, comments = ?, change_by = ? '
+             . 'add_new = ?, new_address = ?, comments = ?, change_by = ?, '
              . 'change_time = current_timestamp '
              . 'WHERE id = ?',
         Bind => [
