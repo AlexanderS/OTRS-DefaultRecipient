@@ -337,9 +337,12 @@ sub _Overview {
             ID => $ID,
         );
 
+        my %YesNo = ( 0 => 'No', 1 => 'Yes' );
         $Self->{LayoutObject}->Block(
             Name => 'OverviewResultRow',
             Data => {
+                RemoveDefaultYesNo => $YesNo{ $DefaultRecipient{RemoveDefault} },
+                AddNewYesNo => $YesNo{ $DefaultRecipient{AddNew} },
                 %DefaultRecipient,
             },
         );
