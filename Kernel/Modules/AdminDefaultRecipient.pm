@@ -1,5 +1,5 @@
 # --
-# Kernel/Modules/AdminDefaultTo.pm - provides admin DefaultTo module
+# Kernel/Modules/AdminDefaultRecipient.pm - provides admin DefaultRecipient module
 # Copyright (C) 2015 Alexander Sulfrian <alex@spline.inf.fu-berlin.de>
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
@@ -7,7 +7,7 @@
 # did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
 # --
 
-package Kernel::Modules::AdminDefaultTo;
+package Kernel::Modules::AdminDefaultRecipient;
 
 use strict;
 use warnings;
@@ -17,7 +17,7 @@ our @ObjectDependencies = qw(
     Kernel::Output::HTML::Layout
     Kernel::System::DB
     Kernel::System::Web::Request
-    Kernel::System::DefaultTo
+    Kernel::System::DefaultRecipient
 );
 
 sub new {
@@ -45,8 +45,8 @@ sub Run {
     # ------------------------------------------------------------ #
     if ( $Self->{Subaction} eq 'Change' ) {
         my $ID = $Self->{ParamObject}->GetParam( Param => 'ID' ) || '';
-        my $DefaultToObject = $Kernel::OM->Get('Kernel::System::DefaultTo');
-        my %Data = $DefaultToObject->Get(
+        my $DefaultRecipientObject = $Kernel::OM->Get('Kernel::System::DefaultRecipient');
+        my %Data = $DefaultRecipientObject->Get(
             ID => $ID,
         );
 
@@ -57,7 +57,7 @@ sub Run {
             %Data,
         );
         $Output .= $Self->{LayoutObject}->Output(
-            TemplateFile => 'AdminDefaultTo',
+            TemplateFile => 'AdminDefaultRecipient',
             Data         => \%Param,
         );
         $Output .= $Self->{LayoutObject}->Footer();
@@ -71,7 +71,7 @@ sub Run {
         # challenge token check for write action
         $Self->{LayoutObject}->ChallengeTokenCheck();
 
-        my $DefaultToObject = $Kernel::OM->Get('Kernel::System::DefaultTo');
+        my $DefaultRecipientObject = $Kernel::OM->Get('Kernel::System::DefaultRecipient');
         my @NewIDs = $Self->{ParamObject}->GetArray( Param => 'IDs' );
         my ( %GetParam, %Errors );
         for my $Parameter (qw(ID Title RemoveDefault AddNew NewAddress
@@ -84,8 +84,8 @@ sub Run {
         # check needed data
         $Errors{TitleInvalid} = 'ServerError' if !$GetParam{Title};
 
-        # check if a DefaultTo entry exist with this title
-        my $TitleExists = $DefaultToObject->TitleExistsCheck(
+        # check if a DefaultRecipient entry exist with this title
+        my $TitleExists = $DefaultRecipientObject->TitleExistsCheck(
             Title => $GetParam{Title},
             ID    => $GetParam{ID}
         );
@@ -98,7 +98,7 @@ sub Run {
         # if no errors occurred
         if ( !%Errors ) {
 
-            if ( $DefaultToObject->Update(
+            if ( $DefaultRecipientObject->Update(
                      %GetParam,
                      UserID => $Self->{UserID},
                  )
@@ -109,7 +109,7 @@ sub Run {
                 $Output .= $Self->{LayoutObject}->NavigationBar();
                 $Output .= $Self->{LayoutObject}->Notify( Info => 'Template updated!' );
                 $Output .= $Self->{LayoutObject}->Output(
-                    TemplateFile => 'AdminDefaultTo',
+                    TemplateFile => 'AdminDefaultRecipient',
                     Data         => \%Param,
                 );
                 $Output .= $Self->{LayoutObject}->Footer();
@@ -127,7 +127,7 @@ sub Run {
             %GetParam,
         );
         $Output .= $Self->{LayoutObject}->Output(
-            TemplateFile => 'AdminDefaultTo',
+            TemplateFile => 'AdminDefaultRecipient',
             Data         => \%Param,
         );
         $Output .= $Self->{LayoutObject}->Footer();
@@ -147,7 +147,7 @@ sub Run {
             Title => $Title,
         );
         $Output .= $Self->{LayoutObject}->Output(
-            TemplateFile => 'AdminDefaultTo',
+            TemplateFile => 'AdminDefaultRecipient',
             Data         => \%Param,
         );
         $Output .= $Self->{LayoutObject}->Footer();
@@ -161,7 +161,7 @@ sub Run {
         # challenge token check for write action
         $Self->{LayoutObject}->ChallengeTokenCheck();
 
-        my $DefaultToObject = $Kernel::OM->Get('Kernel::System::DefaultTo');
+        my $DefaultRecipientObject = $Kernel::OM->Get('Kernel::System::DefaultRecipient');
         my @NewIDs = $Self->{ParamObject}->GetArray( Param => 'IDs' );
         my ( %GetParam, %Errors );
 
@@ -173,8 +173,8 @@ sub Run {
         # check needed data
         $Errors{TitleInvalid} = 'ServerError' if !$GetParam{Title};
         
-        # check if a DefaultTo entry exists with this title
-        my $TitleExists = $DefaultToObject->TitleExistsCheck( Title => $GetParam{Title} );
+        # check if a DefaultRecipient entry exists with this title
+        my $TitleExists = $DefaultRecipientObject->TitleExistsCheck( Title => $GetParam{Title} );
         if ($TitleExists) {
             $Errors{TitleExists} = 1;
             $Errors{TitleInvalid} = 'ServerError';
@@ -183,8 +183,8 @@ sub Run {
         # if no errors occurred
         if ( !%Errors ) {
 
-            # add DefaultTo entry
-            my $ID = $DefaultToObject->Add(
+            # add DefaultRecipient entry
+            my $ID = $DefaultRecipientObject->Add(
                 %GetParam,
                 UserID => $Self->{UserID},
             );
@@ -195,7 +195,7 @@ sub Run {
                 $Output .= $Self->{LayoutObject}->NavigationBar();
                 $Output .= $Self->{LayoutObject}->Notify( Info => 'Template added!' );
                 $Output .= $Self->{LayoutObject}->Output(
-                    TemplateFile => 'AdminDefaultTo',
+                    TemplateFile => 'AdminDefaultRecipient',
                     Data         => \%Param,
                 );
                 $Output .= $Self->{LayoutObject}->Footer();
@@ -213,7 +213,7 @@ sub Run {
             %GetParam,
         );
         $Output .= $Self->{LayoutObject}->Output(
-            TemplateFile => 'AdminDefaultTo',
+            TemplateFile => 'AdminDefaultRecipient',
             Data         => \%Param,
         );
         $Output .= $Self->{LayoutObject}->Footer();
@@ -227,10 +227,10 @@ sub Run {
         # challenge token check for write action
         $Self->{LayoutObject}->ChallengeTokenCheck();
 
-        my $DefaultToObject = $Kernel::OM->Get('Kernel::System::DefaultTo');
+        my $DefaultRecipientObject = $Kernel::OM->Get('Kernel::System::DefaultRecipient');
         my $ID = $Self->{ParamObject}->GetParam( Param => 'ID' );
 
-        my $Delete = $DefaultToObject->Delete(
+        my $Delete = $DefaultRecipientObject->Delete(
             ID => $ID,
         );
         if ( !$Delete ) {
@@ -248,7 +248,7 @@ sub Run {
         my $Output = $Self->{LayoutObject}->Header();
         $Output .= $Self->{LayoutObject}->NavigationBar();
         $Output .= $Self->{LayoutObject}->Output(
-            TemplateFile => 'AdminDefaultTo',
+            TemplateFile => 'AdminDefaultRecipient',
             Data         => \%Param,
         );
         $Output .= $Self->{LayoutObject}->Footer();
@@ -268,21 +268,21 @@ sub _Edit {
     $Self->{LayoutObject}->Block( Name => 'ActionList' );
     $Self->{LayoutObject}->Block( Name => 'ActionOverview' );
 
-    $Param{DefaultToTitleString} = '';
+    $Param{DefaultRecipientTitleString} = '';
 
-    $Param{DefaultToRemoveDefaultOption} = $Self->{LayoutObject}->BuildSelection(
+    $Param{DefaultRecipientRemoveDefaultOption} = $Self->{LayoutObject}->BuildSelection(
         Data       => $Self->{ConfigObject}->Get('YesNoOptions'),
         Name       => 'RemoveDefault',
         SelectedID => $Param{RemoveDefault} || 0,
     );
 
-    $Param{DefaultToAddNewOption} = $Self->{LayoutObject}->BuildSelection(
+    $Param{DefaultRecipientAddNewOption} = $Self->{LayoutObject}->BuildSelection(
         Data       => $Self->{ConfigObject}->Get('YesNoOptions'),
         Name       => 'AddNew',
         SelectedID => $Param{AddNew} || 0,
     );
 
-    $Param{DefaultToNewAddressString} = '';
+    $Param{DefaultRecipientNewAddressString} = '';
 
     $Self->{LayoutObject}->Block(
         Name => 'OverviewUpdate',
@@ -328,19 +328,19 @@ sub _Overview {
         Data => \%Param,
     );
 
-    my $DefaultToObject = $Kernel::OM->Get('Kernel::System::DefaultTo');
-    my %List = $DefaultToObject->List();
+    my $DefaultRecipientObject = $Kernel::OM->Get('Kernel::System::DefaultRecipient');
+    my %List = $DefaultRecipientObject->List();
 
     for my $ID ( sort { $List{$a} cmp $List{$b} } keys %List )
     {
-        my %DefaultTo = $DefaultToObject->Get(
+        my %DefaultRecipient = $DefaultRecipientObject->Get(
             ID => $ID,
         );
 
         $Self->{LayoutObject}->Block(
             Name => 'OverviewResultRow',
             Data => {
-                %DefaultTo,
+                %DefaultRecipient,
             },
         );
     }

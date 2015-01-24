@@ -1,5 +1,5 @@
 # --
-# Kernel/Modules/AdminDefaultToTemplates.pm - to manage DefaultTo <-> templates assignments
+# Kernel/Modules/AdminDefaultRecipientTemplates.pm - to manage DefaultRecipient <-> templates assignments
 # Copyright (C) 2015 Alexander Sulfrian <alex@spline.inf.fu-berlin.de>
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
@@ -7,7 +7,7 @@
 # did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
 # --
 
-package Kernel::Modules::AdminDefaultToTemplates;
+package Kernel::Modules::AdminDefaultRecipientTemplates;
 
 use strict;
 use warnings;
@@ -15,7 +15,7 @@ use warnings;
 our @ObjectDependencies = qw(
     Kernel::Output::HTML::Layout
     Kernel::System::DB
-    Kernel::System::DefaultTo
+    Kernel::System::DefaultRecipient
     Kernel::System::StandardTemplate
     Kernel::System::Web::Request
 );
@@ -41,7 +41,7 @@ sub Run {
     my ( $Self, %Param ) = @_;
 
     # ------------------------------------------------------------ #
-    # template <-> DefaultTo 1:n
+    # template <-> DefaultRecipient 1:n
     # ------------------------------------------------------------ #
     if ( $Self->{Subaction} eq 'Template' ) {
 
@@ -54,17 +54,17 @@ sub Run {
         );
         my $Name = $StandardTemplateType . ' - ' . $StandardTemplateData{Name};
 
-        # get DefaultTo data
-        my $DefaultToObject = $Kernel::OM->Get('Kernel::System::DefaultTo');
-        my %DefaultToData = $DefaultToObject->List();
-        my %Member = $DefaultToObject->MappingList(
+        # get DefaultRecipient data
+        my $DefaultRecipientObject = $Kernel::OM->Get('Kernel::System::DefaultRecipient');
+        my %DefaultRecipientData = $DefaultRecipientObject->List();
+        my %Member = $DefaultRecipientObject->MappingList(
             TemplateID => $ID,
         );
 
         my $Output = $Self->{LayoutObject}->Header();
         $Output .= $Self->{LayoutObject}->NavigationBar();
         $Output .= $Self->_Change(
-            Data    => \%DefaultToData,
+            Data    => \%DefaultRecipientData,
             ID      => $ID,
             Name    => $Name,
             Mapping => \%Member,
@@ -75,13 +75,13 @@ sub Run {
     }
 
     # ------------------------------------------------------------ #
-    # templates <-> DefaultTo n:1
+    # templates <-> DefaultRecipient n:1
     # ------------------------------------------------------------ #
-    elsif ( $Self->{Subaction} eq 'DefaultTo' ) {
+    elsif ( $Self->{Subaction} eq 'DefaultRecipient' ) {
 
         my $ID = $Self->{ParamObject}->GetParam( Param => 'ID' );
-        my $DefaultToObject = $Kernel::OM->Get('Kernel::System::DefaultTo');
-        my %DefaultToData = $DefaultToObject->Get( ID => $ID );
+        my $DefaultRecipientObject = $Kernel::OM->Get('Kernel::System::DefaultRecipient');
+        my %DefaultRecipientData = $DefaultRecipientObject->Get( ID => $ID );
 
         # get templates
         my $StandardTemplateObject = $Kernel::OM->Get('Kernel::System::StandardTemplate');
@@ -102,8 +102,8 @@ sub Run {
         }
 
         # get assigned templates
-        my %Member = $DefaultToObject->MappingList(
-            DefaultToID => $ID,
+        my %Member = $DefaultRecipientObject->MappingList(
+            DefaultRecipientID => $ID,
         );
 
         my $Output = $Self->{LayoutObject}->Header();
@@ -111,27 +111,27 @@ sub Run {
         $Output .= $Self->_Change(
             Data    => \%StandardTemplateData,
             ID      => $ID,
-            Name    => $DefaultToData{Title},
+            Name    => $DefaultRecipientData{Title},
             Mapping => \%Member,
-            Type    => 'DefaultTo',
+            Type    => 'DefaultRecipient',
         );
         $Output .= $Self->{LayoutObject}->Footer();
         return $Output;
     }
 
     # ------------------------------------------------------------ #
-    # add templates to DefaultTo
+    # add templates to DefaultRecipient
     # ------------------------------------------------------------ #
-    elsif ( $Self->{Subaction} eq 'ChangeDefaultTo' ) {
+    elsif ( $Self->{Subaction} eq 'ChangeDefaultRecipient' ) {
 
         # challenge token check for write action
         $Self->{LayoutObject}->ChallengeTokenCheck();
 
         # get current mapping
         my $ID = $Self->{ParamObject}->GetParam( Param => 'ID' );
-        my $DefaultToObject = $Kernel::OM->Get('Kernel::System::DefaultTo');
-        my %Mapping = $DefaultToObject->MappingList(
-            DefaultToID => $ID,
+        my $DefaultRecipientObject = $Kernel::OM->Get('Kernel::System::DefaultRecipient');
+        my %Mapping = $DefaultRecipientObject->MappingList(
+            DefaultRecipientID => $ID,
         );
 
         # get new templates
@@ -145,15 +145,15 @@ sub Run {
         for my $TemplateID (@TemplatesAll) {
             if ( $TemplatesSelected{$TemplateID} ) {
                 if ( ! $Mapping{$TemplateID} ) {
-                    $DefaultToObject->MappingAdd(
+                    $DefaultRecipientObject->MappingAdd(
                         TemplateID => $TemplateID,
-                        DefaultToID => $ID,
+                        DefaultRecipientID => $ID,
                     );
                 }
             }
             else {
                 if ( $Mapping{$TemplateID} ) {
-                    $DefaultToObject->MappingDelete(
+                    $DefaultRecipientObject->MappingDelete(
                         ID => $Mapping{$TemplateID},
                     );
                 }
@@ -173,8 +173,8 @@ sub Run {
 
         # get current mapping
         my $ID = $Self->{ParamObject}->GetParam( Param => 'ID' );
-        my $DefaultToObject = $Kernel::OM->Get('Kernel::System::DefaultTo');
-        my %Mapping = $DefaultToObject->MappingList(
+        my $DefaultRecipientObject = $Kernel::OM->Get('Kernel::System::DefaultRecipient');
+        my %Mapping = $DefaultRecipientObject->MappingList(
             TemplateID => $ID,
         );
 
@@ -186,19 +186,19 @@ sub Run {
         my %Selected = map { $_ => 1 } @Selected;
 
         # check all used queues
-        for my $DefaultToID (@All) {
-            if ( $Selected{$DefaultToID} ) {
-                if ( ! $Mapping{$DefaultToID} ) {
-                    $DefaultToObject->MappingAdd(
+        for my $DefaultRecipientID (@All) {
+            if ( $Selected{$DefaultRecipientID} ) {
+                if ( ! $Mapping{$DefaultRecipientID} ) {
+                    $DefaultRecipientObject->MappingAdd(
                         TemplateID => $ID,
-                        DefaultToID => $DefaultToID,
+                        DefaultRecipientID => $DefaultRecipientID,
                     );
                 }
             }
             else {
-                if ( $Mapping{$DefaultToID} ) {
-                    $DefaultToObject->MappingDelete(
-                        ID => $Mapping{$DefaultToID},
+                if ( $Mapping{$DefaultRecipientID} ) {
+                    $DefaultRecipientObject->MappingDelete(
+                        ID => $Mapping{$DefaultRecipientID},
                     );
                 }
             }
@@ -223,8 +223,8 @@ sub _Change {
     my %Data    = %{ $Param{Data} };
     my %Mapping = %{ $Param{Mapping} };
     my $Type    = $Param{Type} || 'Template';
-    my $NeType  = 'DefaultTo';
-    $NeType     = 'Template' if $Type eq 'DefaultTo';
+    my $NeType  = 'DefaultRecipient';
+    $NeType     = 'Template' if $Type eq 'DefaultRecipient';
 
     $Self->{LayoutObject}->Block( Name => 'Overview' );
     $Self->{LayoutObject}->Block( Name => 'ActionList' );
@@ -260,7 +260,7 @@ sub _Change {
     }
 
     return $Self->{LayoutObject}->Output(
-        TemplateFile => 'AdminDefaultToTemplates',
+        TemplateFile => 'AdminDefaultRecipientTemplates',
         Data         => \%Param,
     );
 }
@@ -276,7 +276,7 @@ sub _Overview {
     # no actions in action list
     #    $Self->{LayoutObject}->Block(Name=>'ActionList');
     $Self->{LayoutObject}->Block( Name => 'FilterTemplate' );
-    $Self->{LayoutObject}->Block( Name => 'FilterDefaultTo' );
+    $Self->{LayoutObject}->Block( Name => 'FilterDefaultRecipient' );
     $Self->{LayoutObject}->Block( Name => 'OverviewResult' );
 
     # get std template list
@@ -323,14 +323,14 @@ sub _Overview {
     }
 
     # get queue data
-    my $DefaultToObject = $Kernel::OM->Get('Kernel::System::DefaultTo');
-    my %DefaultToData = $DefaultToObject->List();
+    my $DefaultRecipientObject = $Kernel::OM->Get('Kernel::System::DefaultRecipient');
+    my %DefaultRecipientData = $DefaultRecipientObject->List();
 
     # if there are results to show
-    if (%DefaultToData) {
+    if (%DefaultRecipientData) {
         for my $ID (
-            sort { uc( $DefaultToData{$a} ) cmp uc( $DefaultToData{$b} ) }
-            keys %DefaultToData
+            sort { uc( $DefaultRecipientData{$a} ) cmp uc( $DefaultRecipientData{$b} ) }
+            keys %DefaultRecipientData
             )
         {
 
@@ -338,8 +338,8 @@ sub _Overview {
             $Self->{LayoutObject}->Block(
                 Name => 'Listn1',
                 Data => {
-                    Name      => $DefaultToData{$ID},
-                    Subaction => 'DefaultTo',
+                    Name      => $DefaultRecipientData{$ID},
+                    Subaction => 'DefaultRecipient',
                     ID        => $ID,
                 },
             );
@@ -349,14 +349,14 @@ sub _Overview {
     # otherwise it displays a no data found message
     else {
         $Self->{LayoutObject}->Block(
-            Name => 'NoDefaultToFoundMsg',
+            Name => 'NoDefaultRecipientFoundMsg',
             Data => {},
         );
     }
 
     # return output
     return $Self->{LayoutObject}->Output(
-        TemplateFile => 'AdminDefaultToTemplates',
+        TemplateFile => 'AdminDefaultRecipientTemplates',
         Data         => \%Param,
     );
 }

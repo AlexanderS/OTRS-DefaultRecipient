@@ -1,5 +1,5 @@
 # --
-# AdminDefaultToTemplates.tt - provides HTML form for AdminInterface
+# AdminDefaultRecipientTemplates.tt - provides HTML form for AdminInterface
 # Copyright (C) 2015 Alexander Sulfrian <alex@spline.inf.fu-berlin.de>
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
@@ -9,7 +9,7 @@
 
 [% RenderBlockStart("Overview") %]
 <div class="MainBox ARIARoleMain LayoutFixedSidebar SidebarFirst">
-    <h1>[% Translate("Manage Template-DefaultTo Relations") | html %]</h1>
+    <h1>[% Translate("Manage Template-DefaultRecipient Relations") | html %]</h1>
 
     <div class="SidebarColumn">
 
@@ -51,16 +51,16 @@
             </div>
         </div>
 [% RenderBlockEnd("FilterTemplate") %]
-[% RenderBlockStart("FilterDefaultTo") %]
+[% RenderBlockStart("FilterDefaultRecipient") %]
         <div class="WidgetSimple">
             <div class="Header">
-                <h2><label for="FilterDefaultTo">[% Translate("Filter for DefaultTo") | html %]</label></h2>
+                <h2><label for="FilterDefaultRecipient">[% Translate("Filter for DefaultRecipient") | html %]</label></h2>
             </div>
             <div class="Content">
-                <input type="text" id="FilterDefaultTo" class="FilterBox" placeholder="[% Translate("Just start typing to filter...") | html %]" name="FilterDefaultTo" value="" title="[% Translate("Filter for DefaultTo") | html %]" />
+                <input type="text" id="FilterDefaultRecipient" class="FilterBox" placeholder="[% Translate("Just start typing to filter...") | html %]" name="FilterDefaultRecipient" value="" title="[% Translate("Filter for DefaultRecipient") | html %]" />
             </div>
         </div>
-[% RenderBlockEnd("FilterDefaultTo") %]
+[% RenderBlockEnd("FilterDefaultRecipient") %]
 
     </div>
 
@@ -85,12 +85,12 @@
                     </ul>
                 </div>
                 <div class="Size1of2">
-                    <ul class="Tablelike" id="DefaultTo">
-                        <li class="Header">[% Translate("DefaultTo") | html %]</li>
+                    <ul class="Tablelike" id="DefaultRecipient">
+                        <li class="Header">[% Translate("DefaultRecipient") | html %]</li>
                         <li class="FilterMessage Hidden">[% Translate("No matches found.") | html %]</li>
-[% RenderBlockStart("NoDefaultToFoundMsg") %]
+[% RenderBlockStart("NoDefaultRecipientFoundMsg") %]
                         <li>[% Translate("No data found.") | html %]</li>
-[% RenderBlockEnd("NoDefaultToFoundMsg") %]
+[% RenderBlockEnd("NoDefaultRecipientFoundMsg") %]
 [% RenderBlockStart("Listn1") %]
                         <li><a href="[% Env("Baselink") %]Action=[% Env("Action") %];Subaction=[% Data.Subaction | uri %];ID=[% Data.ID | uri %]" class="AsBlock">[% Data.Name | html %]</a></li>
 [% RenderBlockEnd("Listn1") %]
@@ -102,18 +102,18 @@
 [% WRAPPER JSOnDocumentComplete %]
 <script type="text/javascript">//<![CDATA[
     Core.UI.Table.InitTableFilter($('#FilterTemplates'), $('#Templates'));
-    Core.UI.Table.InitTableFilter($('#FilterDefaultTo'), $('#DefaultTo'));
+    Core.UI.Table.InitTableFilter($('#FilterDefaultRecipient'), $('#DefaultRecipient'));
 //]]></script>
 [% END %]
 [% RenderBlockEnd("OverviewResult") %]
 [% RenderBlockStart("Change") %]
             <div class="Header">
                 <h2>
-[% RenderBlockStart("ChangeHeaderDefaultTo") %]
-                    [% Translate("Change DefaultTo Relations for Template") | html %]
-[% RenderBlockEnd("ChangeHeaderDefaultTo") %]
+[% RenderBlockStart("ChangeHeaderDefaultRecipient") %]
+                    [% Translate("Change DefaultRecipient Relations for Template") | html %]
+[% RenderBlockEnd("ChangeHeaderDefaultRecipient") %]
 [% RenderBlockStart("ChangeHeaderTemplate") %]
-                    [% Translate("Change Template Relations for DefaultTo") | html %]
+                    [% Translate("Change Template Relations for DefaultRecipient") | html %]
 [% RenderBlockEnd("ChangeHeaderTemplate") %]
                     <a href="[% Env("Baselink") %]Action=[% Data.ActionHome | uri %];Subaction=Change;ID=[% Data.ID | uri %]">[% Data.Name | html %]</a>
                 </h2>

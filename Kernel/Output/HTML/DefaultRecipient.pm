@@ -1,16 +1,16 @@
 # --
-# Kernel/Output/HTML/DefaultTo.pm
+# Kernel/Output/HTML/DefaultRecipient.pm
 # Copyright (C) 2015 Alexander Sulfrian <alex@spline.inf.fu-berlin.de>
 # --
 
-package Kernel::Output::HTML::DefaultTo;
+package Kernel::Output::HTML::DefaultRecipient;
 
 use strict;
 use warnings;
 
 our @ObjectDependencies = qw(
     Kernel::System::Log
-    Kernel::System::DefaultTo
+    Kernel::System::DefaultRecipient
 );
 
 sub new {
@@ -20,7 +20,7 @@ sub new {
     my $Self = {};
     $Self->{LayoutObject} = $Param{LayoutObject} || die "Got no LayoutObject!";
     $Self->{LogObject} = $Kernel::OM->Get('Kernel::System::Log');
-    $Self->{DefaultToObject} = $Kernel::OM->Get('Kernel::System::DefaultTo');
+    $Self->{DefaultRecipientObject} = $Kernel::OM->Get('Kernel::System::DefaultRecipient');
     bless( $Self, $Type );
 
     return $Self;
@@ -30,7 +30,7 @@ sub Run {
     my ( $Self, %Param ) = @_;
     return if !$Self->{LayoutObject};
 
-    for (qw(LogObject LayoutObject DefaultToObject)) {
+    for (qw(LogObject LayoutObject DefaultRecipientObject)) {
         return if !$Self->{$_};
     }
 
@@ -58,21 +58,21 @@ sub Run {
     # return if not generated from template
     return unless $Ticket->{TemplateID};
 
-    # get all DefaultTo
-    my %MappedDefaultTo = $Self->{DefaultToObject}->MappingList(
+    # get all DefaultRecipient
+    my %MappedDefaultRecipient = $Self->{DefaultRecipientObject}->MappingList(
         TemplateID => $Ticket->{TemplateID},
     );
 
     my $RemoveDefault = 0;
     my @Addresses = ();
-    foreach my $ID ( values %MappedDefaultTo ) {
-        my %DefaultTo = $Self->{DefaultToObject}->Get(
+    foreach my $ID ( values %MappedDefaultRecipient ) {
+        my %DefaultRecipient = $Self->{DefaultRecipientObject}->Get(
             ID => $ID,
         );
 
-        $RemoveDefault = 1 if $DefaultTo{RemoveDefault};
-        if ( $DefaultTo{AddNew} ) {
-            push @Addresses, $DefaultTo{NewAddress};
+        $RemoveDefault = 1 if $DefaultRecipient{RemoveDefault};
+        if ( $DefaultRecipient{AddNew} ) {
+            push @Addresses, $DefaultRecipient{NewAddress};
         }
     }
 

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <otrs_package version="1.0">
-  <Name>DefaultTo</Name>
+  <Name>DefaultRecipient</Name>
   <Version>1.0.0</Version>
   <Framework>4.0.x</Framework>
   <Vendor>spline.de</Vendor>
@@ -11,16 +11,16 @@
   <BuildDate>?</BuildDate>
   <BuildHost>?</BuildHost>
   <Filelist>
-    <File Permission="644" Location="Kernel/Config/Files/DefaultTo.xml"/>
-    <File Permission="644" Location="Kernel/Modules/AdminDefaultTo.pm"/>
-    <File Permission="644" Location="Kernel/Modules/AdminDefaultToTemplates.pm"/>
-    <File Permission="644" Location="Kernel/Output/HTML/DefaultTo.pm"/>
-    <File Permission="644" Location="Kernel/Output/HTML/Standard/AdminDefaultTo.tt"/>
-    <File Permission="644" Location="Kernel/Output/HTML/Standard/AdminDefaultToTemplates.tt"/>
-    <File Permission="644" Location="Kernel/System/DefaultTo.pm"/>
+    <File Permission="644" Location="Kernel/Config/Files/DefaultRecipient.xml"/>
+    <File Permission="644" Location="Kernel/Modules/AdminDefaultRecipient.pm"/>
+    <File Permission="644" Location="Kernel/Modules/AdminDefaultRecipientTemplates.pm"/>
+    <File Permission="644" Location="Kernel/Output/HTML/DefaultRecipient.pm"/>
+    <File Permission="644" Location="Kernel/Output/HTML/Standard/AdminDefaultRecipient.tt"/>
+    <File Permission="644" Location="Kernel/Output/HTML/Standard/AdminDefaultRecipientTemplates.tt"/>
+    <File Permission="644" Location="Kernel/System/DefaultRecipient.pm"/>
   </Filelist>
   <DatabaseInstall>
-    <TableCreate Name="default_to">
+    <TableCreate Name="default_recipient">
       <Column Name="id" Required="true" PrimaryKey="true" AutoIncrement="true" Type="BIGINT"/>
       <Column Name="title" Required="true" Size="250" Type="VARCHAR"/>
       <Column Name="remove_default" Required="true" Type="SMALLINT"/>
@@ -31,29 +31,29 @@
       <Column Name="create_by" Required="true" Type="INTEGER"/>
       <Column Name="change_time" Required="true" Type="DATE"/>
       <Column Name="change_by" Required="true" Type="INTEGER"/>
-      <Index Name="default_to_title">
+      <Index Name="default_recipient_title">
         <IndexColumn Name="title"/>
       </Index>
-      <Unique Name="default_to_unique_title">
+      <Unique Name="default_recipient_unique_title">
         <UniqueColumn Name="title"/>
       </Unique>
     </TableCreate>
-    <TableCreate Name="default_to_response">
+    <TableCreate Name="default_recipient_response">
       <Column Name="id" Required="true" PrimaryKey="true" AutoIncrement="true" Type="BIGINT"/>
-      <Column Name="default_to_id" Required="true" Type="BIGINT"/>
+      <Column Name="default_recipient_id" Required="true" Type="BIGINT"/>
       <Column Name="template_id" Required="true" Type="BIGINT"/>
-      <Index Name="default_to_template_default_to_id">
-        <IndexColumn Name="default_to_id"/>
+      <Index Name="default_recipient_template_default_recipient_id">
+        <IndexColumn Name="default_recipient_id"/>
       </Index>
-      <Index Name="default_to_template_template_id">
+      <Index Name="default_recipient_template_template_id">
         <IndexColumn Name="template_id"/>
       </Index>
-      <Unique Name="default_to_template_map">
-        <UniqueColumn Name="default_to_id"/>
+      <Unique Name="default_recipient_template_map">
+        <UniqueColumn Name="default_recipient_id"/>
         <UniqueColumn Name="template_id"/>
       </Unique>
-      <ForeignKey ForeignTable="default_to">
-        <Reference Local="default_to_id" Foreign="id"/>
+      <ForeignKey ForeignTable="default_recipient">
+        <Reference Local="default_recipient_id" Foreign="id"/>
       </ForeignKey>
       <ForeignKey ForeignTable="standard_template">
         <Reference Local="template_id" Foreign="id"/>
@@ -61,7 +61,7 @@
     </TableCreate>
   </DatabaseInstall>
   <DatabaseUninstall>
-    <TableDrop Name="default_to_response"/>
-    <TableDrop Name="default_to"/>
+    <TableDrop Name="default_recipient_response"/>
+    <TableDrop Name="default_recipient"/>
   </DatabaseUninstall>
 </otrs_package>

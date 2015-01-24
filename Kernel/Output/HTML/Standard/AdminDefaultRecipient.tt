@@ -1,5 +1,5 @@
 # --
-# AdminDefaultTo.tt - provides HTML form for AdminDefaultTo
+# AdminDefaultRecipient.tt - provides HTML form for AdminDefaultRecipient
 # Copyright (C) 2015 Alexander Sulfrian <alex@spline.inf.fu-berlin.de>
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
@@ -9,7 +9,7 @@
 
 [% RenderBlockStart("Overview") %]
 <div class="MainBox ARIARoleMain LayoutFixedSidebar SidebarFirst">
-    <h1>[% Translate("Manage DefaultTo") | html %]</h1>
+    <h1>[% Translate("Manage DefaultRecipient") | html %]</h1>
 
     <div class="SidebarColumn">
 [% RenderBlockStart("ActionList") %]
@@ -24,7 +24,7 @@
 [% RenderBlockEnd("ActionOverview") %]
 [% RenderBlockStart("ActionAdd") %]
                     <li>
-                        <a href="[% Env("Baselink") %]Action=[% Env("Action") %];Subaction=Add" class="CallForAction Fullsize Center"><span><i class="fa fa-plus-square"></i>[% Translate("Add DefaultTo") | html %]</span></a>
+                        <a href="[% Env("Baselink") %]Action=[% Env("Action") %];Subaction=Add" class="CallForAction Fullsize Center"><span><i class="fa fa-plus-square"></i>[% Translate("Add DefaultRecipient") | html %]</span></a>
                     </li>
 [% RenderBlockEnd("ActionAdd") %]
                 </ul>
@@ -49,11 +49,11 @@
             <div class="Content">
 
                 <p class="FieldExplanation">
-                    [% Translate("With DefaultTo you could change or extend the default To address in a ticket response dependent on the used template.") | html %]
+                    [% Translate("With DefaultRecipient you could change or extend the default To address in a ticket response dependent on the used template.") | html %]
                 </p>
                 <p>
                     [% Translate("Attention") | html %]:
-                    <a href="[% Env("Baselink") %]Action=AdminDefaultToTemplates">[% Translate("Don't forget to add new DefaultTo entries to templates.") | html %]</a>
+                    <a href="[% Env("Baselink") %]Action=AdminDefaultRecipientTemplates">[% Translate("Don't forget to add new DefaultRecipients to templates.") | html %]</a>
                 </p>
             </div>
         </div>
@@ -66,7 +66,7 @@
                 <h2>[% Translate("List") | html %]</h2>
             </div>
             <div class="Content">
-                <table class="DataTable" id="DefaultTo">
+                <table class="DataTable" id="DefaultRecipient">
                     <thead>
                         <tr>
                             <th>[% Translate("Title") | html %]</th>
@@ -115,7 +115,7 @@
         </div>
 [% WRAPPER JSOnDocumentComplete %]
 <script type="text/javascript">//<![CDATA[
-    Core.UI.Table.InitTableFilter($('#Filter'), $('#DefaultTo'));
+    Core.UI.Table.InitTableFilter($('#Filter'), $('#DefaultRecipient'));
 //]]></script>
 [% END %]
 [% RenderBlockEnd("OverviewResult") %]
@@ -124,10 +124,10 @@
         <div class="WidgetSimple">
             <div class="Header">
 [% RenderBlockStart("HeaderAdd") %]
-                <h2>[% Translate("Add DefaultTo") | html %]</h2>
+                <h2>[% Translate("Add DefaultRecipient") | html %]</h2>
 [% RenderBlockEnd("HeaderAdd") %]
 [% RenderBlockStart("HeaderEdit") %]
-                <h2>[% Translate("Edit DefaultTo") | html %]</h2>
+                <h2>[% Translate("Edit DefaultRecipient") | html %]</h2>
 [% RenderBlockEnd("HeaderEdit") %]
             </div>
             <div class="Content">
@@ -147,7 +147,7 @@
                                 <p>[% Translate("This field is required.") | html %]</p>
 [% RenderBlockEnd("TitleServerError") %]
 [% RenderBlockStart("ExistTitleServerError") %]
-                                <p>[% Translate("A DefaultTo entry with this title already exists!") | html %]</p>
+                                <p>[% Translate("A DefaultRecipient entry with this title already exists!") | html %]</p>
 [% RenderBlockEnd("TitleServerError") %]
                             </div>
                         </div>
@@ -155,13 +155,13 @@
 
                         <label for="RemoveDefault">[% Translate("Remove default") | html %]:</label>
                         <div class="Field">
-                            [% Data.DefaultToRemoveDefaultOption %]
+                            [% Data.DefaultRecipientRemoveDefaultOption %]
                         </div>
                         <div class="Clear"></div>
 
                         <label for="AddNew">[% Translate("Add new") | html %]:</label>
                         <div class="Field">
-                            [% Data.DefaultToAddNewOption %]
+                            [% Data.DefaultRecipientAddNewOption %]
                         </div>
                         <div class="Clear"></div>
 
@@ -180,7 +180,7 @@
                         <div class="Field">
                             <button class="Primary CallForAction" type="submit" value="[% Translate("Submit") | html %]"><span>[% Translate("Submit") | html %]</span></button>
                             [% Translate("or") | html %]
-                            <a href="[% Env("Baselink") %]Action=AdminDefaultTo">[% Translate("Cancel") | html %]</a>
+                            <a href="[% Env("Baselink") %]Action=AdminDefaultRecipient">[% Translate("Cancel") | html %]</a>
                         </div>
                         <div class="Clear"></div>
                     </fieldset>

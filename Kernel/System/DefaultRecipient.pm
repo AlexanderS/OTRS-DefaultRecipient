@@ -1,5 +1,5 @@
 # --
-# Kernel/System/DefaultTo.pm - core module
+# Kernel/System/DefaultRecipient.pm - core module
 # Copyright (C) 2015 Alexander Sulfrian <alex@spline.inf.fu-berlin.de>
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
@@ -7,7 +7,7 @@
 # did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
 # --
 
-package Kernel::System::DefaultTo;
+package Kernel::System::DefaultRecipient;
 
 use strict;
 use warnings;
@@ -44,9 +44,9 @@ sub Add {
 
     my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
 
-    # insert new DefaultTo
+    # insert new DefaultRecipient
     return if !$DBObject->Do(
-        SQL => 'INSERT INTO default_to '
+        SQL => 'INSERT INTO default_recipient '
              . '(title, remove_default, add_new, new_address, comments, '
              . ' create_time, create_by, change_time, change_by) '
              . 'VALUES (?, ?, ?, ?, ?, current_timestamp, ?, current_timestamp, ?)',
@@ -63,7 +63,7 @@ sub Add {
 
     # get new id
     return if !$DBObject->Prepare(
-        SQL   => 'SELECT MAX(id) FROM default_to WHERE title = ?',
+        SQL   => 'SELECT MAX(id) FROM default_recipient WHERE title = ?',
         Bind  => [ \$Param{Title}, ],
         Limit => 1,
     );
@@ -77,7 +77,7 @@ sub Add {
     my $LogObject = $Kernel::OM->Get('Kernel::System::Log');
     $LogObject->Log(
         Priority => 'notice',
-        Message  => "DefaultTo '$ID' created successfully!",
+        Message  => "DefaultRecipient '$ID' created successfully!",
     );
 
     return $ID;
@@ -101,9 +101,9 @@ sub Update {
 
     my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
 
-    # insert new DefaultTo
+    # insert new DefaultRecipient
     return if !$DBObject->Do(
-        SQL => 'UPDATE default_to SET title = ?, remove_default = ?, '
+        SQL => 'UPDATE default_recipient SET title = ?, remove_default = ?, '
              . 'add_new = ?, new_address = ?, comments = ?, change_by = ?, '
              . 'change_time = current_timestamp '
              . 'WHERE id = ?',
@@ -140,14 +140,14 @@ sub Get {
     return if !$DBObject->Prepare(
         SQL => 'SELECT id, title, remove_default, add_new, new_address, '
              . 'comments, create_time, create_by, change_time, change_by '
-             . 'FROM default_to WHERE id = ?',
+             . 'FROM default_recipient WHERE id = ?',
         Bind  => [ \$Param{ID} ],
         Limit => 1,
     );
 
-    my %DefaultTo;
+    my %DefaultRecipient;
     while ( my @Data = $DBObject->FetchrowArray() ) {
-        %DefaultTo = (
+        %DefaultRecipient = (
             ID            => $Data[0],
             Title         => $Data[1],
             RemoveDefault => $Data[2],
@@ -161,7 +161,7 @@ sub Get {
         );
     }
 
-    return %DefaultTo;
+    return %DefaultRecipient;
 }
 
 sub Delete {
@@ -181,14 +181,14 @@ sub Delete {
 
     # delete mapping
     return if !$DBObject->Do(
-        SQL => 'DELETE FROM default_to_response '
-             . 'WHERE default_to_id = ?',
+        SQL => 'DELETE FROM default_recipient_response '
+             . 'WHERE default_recipient_id = ?',
         Bind => [ \$Param{ID} ],
     );
 
     # delete entry
     return $DBObject->Do(
-        SQL => 'DELETE FROM default_to WHERE id = ?',
+        SQL => 'DELETE FROM default_recipient WHERE id = ?',
         Bind  => [ \$Param{ID} ],
     );
 }
@@ -198,15 +198,15 @@ sub List {
     my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
 
     $DBObject->Prepare(
-        SQL => 'SELECT id, title FROM default_to',
+        SQL => 'SELECT id, title FROM default_recipient',
     );
 
-    my %DefaultTo;
+    my %DefaultRecipient;
     while ( my @Data = $DBObject->FetchrowArray() ) {
-        $DefaultTo{ $Data[0] } = $Data[1];
+        $DefaultRecipient{ $Data[0] } = $Data[1];
     }
 
-    return %DefaultTo;
+    return %DefaultRecipient;
 }
 
 sub TitleExistsCheck {
@@ -214,7 +214,7 @@ sub TitleExistsCheck {
     my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
 
     return if !$DBObject->Prepare(
-        SQL  => 'SELECT id FROM default_to WHERE title = ?',
+        SQL  => 'SELECT id FROM default_recipient WHERE title = ?',
         Bind => [ \$Param{Title} ],
     );
 
@@ -235,7 +235,7 @@ sub MappingAdd {
     my ( $Self, %Param ) = @_;
 
     # check needed stuff
-    for my $Needed (qw(TemplateID DefaultToID)) {
+    for my $Needed (qw(TemplateID DefaultRecipientID)) {
         if ( !$Param{$Needed} ) {
             my $LogObject = $Kernel::OM->Get('Kernel::System::Log');
             $LogObject->Log(
@@ -250,21 +250,21 @@ sub MappingAdd {
 
     # insert new mapping
     return if !$DBObject->Do(
-        SQL => 'INSERT INTO default_to_response '
-             . '(template_id, default_to_id) VALUES (?, ?)',
+        SQL => 'INSERT INTO default_recipient_response '
+             . '(template_id, default_recipient_id) VALUES (?, ?)',
         Bind => [
             \$Param{TemplateID},
-            \$Param{DefaultToID},
+            \$Param{DefaultRecipientID},
         ],
     );
 
     # get new id
     return if !$DBObject->Prepare(
-        SQL   => 'SELECT MAX(id) FROM default_to_response '
-               . 'WHERE template_id = ? AND default_to_id = ?',
+        SQL   => 'SELECT MAX(id) FROM default_recipient_response '
+               . 'WHERE template_id = ? AND default_recipient_id = ?',
         Bind  => [
             \$Param{TemplateID},
-            \$Param{DefaultToID}, ],
+            \$Param{DefaultRecipientID}, ],
         Limit => 1,
     );
 
@@ -277,7 +277,7 @@ sub MappingAdd {
     my $LogObject = $Kernel::OM->Get('Kernel::System::Log');
     $LogObject->Log(
         Priority => 'notice',
-        Message  => "DefaultTo mapping '$ID' "
+        Message  => "DefaultRecipient mapping '$ID' "
                   . "created successfully!",
     );
 
@@ -301,7 +301,7 @@ sub MappingDelete {
 
     # delete mapping
     return $DBObject->Do(
-        SQL => 'DELETE FROM default_to_response '
+        SQL => 'DELETE FROM default_recipient_response '
              . 'WHERE id = ?',
         Bind => [ \$Param{ID} ],
     );
@@ -311,11 +311,11 @@ sub MappingList {
     my ( $Self, %Param ) = @_;
 
      # check needed stuff
-    if ( !$Param{TemplateID} && !$Param{DefaultToID} ) {
+    if ( !$Param{TemplateID} && !$Param{DefaultRecipientID} ) {
         my $LogObject = $Kernel::OM->Get('Kernel::System::Log');
         $LogObject->Log(
             Priority => 'error',
-            Message  => 'Got no TemplateID or DefaultToID!'
+            Message  => 'Got no TemplateID or DefaultRecipientID!'
         );
         return;
     }
@@ -325,8 +325,8 @@ sub MappingList {
     # find mapped objects
     if ( $Param{TemplateID} ) {
         $DBObject->Prepare(
-            SQL => 'SELECT id, default_to_id '
-                 . 'FROM default_to_response '
+            SQL => 'SELECT id, default_recipient_id '
+                 . 'FROM default_recipient_response '
                  . 'WHERE template_id = ?',
             Bind => [ \$Param{TemplateID}, ],
         );
@@ -334,9 +334,9 @@ sub MappingList {
     else {
         $DBObject->Prepare(
             SQL => 'SELECT id, template_id '
-                 . 'FROM default_to_response '
-                 . 'WHERE default_to_id = ?',
-            Bind => [ \$Param{DefaultToID}, ],
+                 . 'FROM default_recipient_response '
+                 . 'WHERE default_recipient_id = ?',
+            Bind => [ \$Param{DefaultRecipientID}, ],
         );
     }
 
