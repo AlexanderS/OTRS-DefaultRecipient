@@ -78,7 +78,7 @@ sub Run {
                               Comment)) {
             $GetParam{$Parameter} = $Self->{ParamObject}->GetParam(
                 Param => $Parameter
-            ) || '';
+            );
         }
 
         # check needed data
@@ -167,7 +167,7 @@ sub Run {
 
         for my $Parameter (qw(ID Title RemoveDefault AddNew NewAddress
                               Comment)) {
-            $GetParam{$Parameter} = $Self->{ParamObject}->GetParam( Param => $Parameter ) || '';
+            $GetParam{$Parameter} = $Self->{ParamObject}->GetParam( Param => $Parameter );
         }
 
         # check needed data
