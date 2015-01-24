@@ -153,39 +153,21 @@
                         </div>
                         <div class="Clear"></div>
 
-                        <label class="Mandatory" for="Name"><span class="Marker">*</span> [% Translate("Remove default") | html %]:</label>
+                        <label for="Name">[% Translate("Remove default") | html %]:</label>
                         <div class="Field">
                             [% Data.DefaultToRemoveDefaultOption %]
-                            <div id="RemoveDefaultError" class="TooltipErrorMessage">
-                                <p>[% Translate("This field is required.") | html %]</p>
-                            </div>
-                            <div id="RemoveDefaultServerError" class="TooltipErrorMessage">
-                                <p>[% Translate("This field is required.") | html %]</p>
-                            </div>
                         </div>
                         <div class="Clear"></div>
 
-                        <label class="Mandatory" for="Name"><span class="Marker">*</span> [% Translate("Add new") | html %]:</label>
+                        <label for="Nane">[% Translate("Add new") | html %]:</label>
                         <div class="Field">
                             [% Data.DefaultToAddNewOption %]
-                            <div id="AddNewError" class="TooltipErrorMessage">
-                                <p>[% Translate("This field is required.") | html %]</p>
-                            </div>
-                            <div id="AddNewServerError" class="TooltipErrorMessage">
-                                <p>[% Translate("This field is required.") | html %]</p>
-                            </div>
                         </div>
                         <div class="Clear"></div>
 
-                        <label class="Mandatory" for="Name"><span class="Marker">*</span> [% Translate("New address") | html %]:</label>
+                        <label for="Name">[% Translate("New address") | html %]:</label>
                         <div class="Field">
-                            <input type="text" name="NewAddress" id="NewAddress" value="[% Data.NewAddress | html %]" class="W50pc Validate_Required" maxlength="200"/>
-                            <div id="NewAddressError" class="TooltipErrorMessage">
-                                <p>[% Translate("This field is required.") | html %]</p>
-                            </div>
-                            <div id="NewAddressServerError" class="TooltipErrorMessage">
-                                <p>[% Translate("This field is required.") | html %]</p>
-                            </div>
+                            <input type="text" name="NewAddress" id="NewAddress" value="[% Data.NewAddress | html %]" class="W50pc" maxlength="200"/>
                         </div>
                         <div class="Clear"></div>
 
