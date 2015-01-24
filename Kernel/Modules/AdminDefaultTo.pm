@@ -138,14 +138,13 @@ sub Run {
     # add
     # ------------------------------------------------------------ #
     elsif ( $Self->{Subaction} eq 'Add' ) {
-        my %GetParam;
-        $GetParam{Title} = $Self->{ParamObject}->GetParam( Param => 'Title' );
+        my $Title = $Self->{ParamObject}->GetParam( Param => 'Title' );
 
         my $Output = $Self->{LayoutObject}->Header();
         $Output .= $Self->{LayoutObject}->NavigationBar();
         $Self->_Edit(
             Action => 'Add',
-            %GetParam,
+            Title => $Title,
         );
         $Output .= $Self->{LayoutObject}->Output(
             TemplateFile => 'AdminDefaultTo',
