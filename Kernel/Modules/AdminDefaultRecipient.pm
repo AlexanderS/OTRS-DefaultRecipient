@@ -107,7 +107,7 @@ sub Run {
                 $Self->_Overview();
                 my $Output = $Self->{LayoutObject}->Header();
                 $Output .= $Self->{LayoutObject}->NavigationBar();
-                $Output .= $Self->{LayoutObject}->Notify( Info => 'Template updated!' );
+                $Output .= $Self->{LayoutObject}->Notify( Info => 'DefaultRecipient updated!' );
                 $Output .= $Self->{LayoutObject}->Output(
                     TemplateFile => 'AdminDefaultRecipient',
                     Data         => \%Param,
@@ -193,7 +193,7 @@ sub Run {
                 $Self->_Overview();
                 my $Output = $Self->{LayoutObject}->Header();
                 $Output .= $Self->{LayoutObject}->NavigationBar();
-                $Output .= $Self->{LayoutObject}->Notify( Info => 'Template added!' );
+                $Output .= $Self->{LayoutObject}->Notify( Info => 'DefaultRecipient added!' );
                 $Output .= $Self->{LayoutObject}->Output(
                     TemplateFile => 'AdminDefaultRecipient',
                     Data         => \%Param,
