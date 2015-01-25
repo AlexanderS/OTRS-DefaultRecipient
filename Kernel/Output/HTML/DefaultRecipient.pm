@@ -73,14 +73,14 @@ sub Run {
         );
 
         $RemoveTo = 1 if $DefaultRecipient{RemoveTo};
-        if ( $DefaultRecipient{AddTo} ne '' ) {
-            push @ToAddresses, $DefaultRecipient{AddTo};
+        if ( $DefaultRecipient{To} ne '' ) {
+            push @ToAddresses, $DefaultRecipient{To};
         }
-        if ( $DefaultRecipient{AddCc} ne '' ) {
-            push @CcAddresses, $DefaultRecipient{AddCc};
+        if ( $DefaultRecipient{Cc} ne '' ) {
+            push @CcAddresses, $DefaultRecipient{Cc};
         }
-        if ( $DefaultRecipient{AddBcc} ne '' ) {
-            push @BccAddresses, $DefaultRecipient{AddBcc};
+        if ( $DefaultRecipient{Bcc} ne '' ) {
+            push @BccAddresses, $DefaultRecipient{Bcc};
         }
     }
 
