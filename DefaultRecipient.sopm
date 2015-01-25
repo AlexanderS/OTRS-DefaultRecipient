@@ -12,6 +12,7 @@
   <BuildHost>?</BuildHost>
   <Filelist>
     <File Permission="644" Location="Kernel/Config/Files/DefaultRecipient.xml"/>
+    <File Permission="644" Location="Kernel/Language/de_AgentDefaultRecipient.pm"/>
     <File Permission="644" Location="Kernel/Modules/AdminDefaultRecipient.pm"/>
     <File Permission="644" Location="Kernel/Modules/AdminDefaultRecipientTemplates.pm"/>
     <File Permission="644" Location="Kernel/Output/HTML/DefaultRecipient.pm"/>
