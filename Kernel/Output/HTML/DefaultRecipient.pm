@@ -60,23 +60,18 @@ sub Run {
     );
 
     my $RemoveTo = 0;
-    my @ToAddresses = ();
-    my @CcAddresses = ();
-    my @BccAddresses = ();
+    my %Addresses = ( To => [], Cc => [], Bcc => [] );
     foreach my $ID ( values %MappedDefaultRecipient ) {
         my %DefaultRecipient = $DefaultRecipientObject->Get(
             ID => $ID,
         );
 
         $RemoveTo = 1 if $DefaultRecipient{RemoveTo};
-        if ( $DefaultRecipient{To} ne '' ) {
-            push @ToAddresses, $DefaultRecipient{To};
-        }
-        if ( $DefaultRecipient{Cc} ne '' ) {
-            push @CcAddresses, $DefaultRecipient{Cc};
-        }
-        if ( $DefaultRecipient{Bcc} ne '' ) {
-            push @BccAddresses, $DefaultRecipient{Bcc};
+
+        for my $addr (qw(To Cc Bcc)) {
+            if ( $DefaultRecipient{ $addr } ne '' ) {
+                push $Addresses{ $addr }, $DefaultRecipient{ $addr };
+            }
         }
     }
 
@@ -92,31 +87,15 @@ sub Run {
     }
 
     # add new addresses
-    foreach my $Address ( @ToAddresses ) {
-        $Self->{LayoutObject}->Block(
-            Name => 'PreFilledToRow',
-            Data => {
-                Email => $Address,
-            },
-        );
-    }
-
-    foreach my $Address ( @CcAddresses ) {
-        $Self->{LayoutObject}->Block(
-            Name => 'PreFilledCcRow',
-            Data => {
-                Email => $Address,
-            },
-        );
-    }
-
-    foreach my $Address ( @BccAddresses ) {
-        $Self->{LayoutObject}->AddJSOnDocumentComplete(
-            Code => 'Core.Agent.CustomerSearch.AddTicketCustomer( '
-                  . "'BccCustomer', "
-                  . $Self->{LayoutObject}->JSONEncode( Data => $Address )
-                  . ' );',
-        );
+    for my $addr (qw(To Cc Bcc)) {
+        for my $Address ( @{$Addresses{ $addr }} ) {
+            $Self->{LayoutObject}->AddJSOnDocumentComplete(
+                Code => 'Core.Agent.CustomerSearch.AddTicketCustomer( '
+                      . "'${addr}Customer', "
+                      . $Self->{LayoutObject}->JSONEncode( Data => $Address )
+                      . ' );',
+            );
+        }
     }
 
     return $Param{Data};
