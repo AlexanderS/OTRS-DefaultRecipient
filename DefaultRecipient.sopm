@@ -23,7 +23,7 @@
     <TableCreate Name="default_recipient">
       <Column Name="id" Required="true" PrimaryKey="true" AutoIncrement="true" Type="BIGINT"/>
       <Column Name="title" Required="true" Size="250" Type="VARCHAR"/>
-      <Column Name="remove_default" Required="true" Type="SMALLINT"/>
+      <Column Name="remove_to" Required="true" Type="SMALLINT"/>
       <Column Name="add_new" Required="true" Type="SMALLINT"/>
       <Column Name="new_address" Required="false" Size="255" Type="VARCHAR"/>
       <Column Name="comments" Required="false" Size="250" Type="VARCHAR"/>

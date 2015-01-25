@@ -31,7 +31,7 @@ sub Add {
     my ( $Self, %Param ) = @_;
 
     # check needed stuff
-    for my $Needed (qw(Title RemoveDefault AddNew NewAddress Comment UserID)) {
+    for my $Needed (qw(Title RemoveTo AddNew NewAddress Comment UserID)) {
         if ( ! defined $Param{$Needed} ) {
             my $LogObject = $Kernel::OM->Get('Kernel::System::Log');
             $LogObject->Log(
@@ -47,12 +47,12 @@ sub Add {
     # insert new DefaultRecipient
     return if !$DBObject->Do(
         SQL => 'INSERT INTO default_recipient '
-             . '(title, remove_default, add_new, new_address, comments, '
+             . '(title, remove_to, add_new, new_address, comments, '
              . ' create_time, create_by, change_time, change_by) '
              . 'VALUES (?, ?, ?, ?, ?, current_timestamp, ?, current_timestamp, ?)',
         Bind => [
             \$Param{Title},
-            \$Param{RemoveDefault},
+            \$Param{RemoveTo},
             \$Param{AddNew},
             \$Param{NewAddress},
             \$Param{Comment},
@@ -87,7 +87,7 @@ sub Update {
     my ( $Self, %Param ) = @_;
 
     # check needed stuff
-    for my $Needed (qw(ID Title RemoveDefault AddNew NewAddress Comment
+    for my $Needed (qw(ID Title RemoveTo AddNew NewAddress Comment
                        UserID)) {
         if ( ! defined $Param{$Needed} ) {
             my $LogObject = $Kernel::OM->Get('Kernel::System::Log');
@@ -103,13 +103,13 @@ sub Update {
 
     # insert new DefaultRecipient
     return if !$DBObject->Do(
-        SQL => 'UPDATE default_recipient SET title = ?, remove_default = ?, '
+        SQL => 'UPDATE default_recipient SET title = ?, remove_to = ?, '
              . 'add_new = ?, new_address = ?, comments = ?, change_by = ?, '
              . 'change_time = current_timestamp '
              . 'WHERE id = ?',
         Bind => [
             \$Param{Title},
-            \$Param{RemoveDefault},
+            \$Param{RemoveTo},
             \$Param{AddNew},
             \$Param{NewAddress},
             \$Param{Comment},
@@ -138,7 +138,7 @@ sub Get {
 
     # get RrsponseChangeDefaultTO obejct
     return if !$DBObject->Prepare(
-        SQL => 'SELECT id, title, remove_default, add_new, new_address, '
+        SQL => 'SELECT id, title, remove_to, add_new, new_address, '
              . 'comments, create_time, create_by, change_time, change_by '
              . 'FROM default_recipient WHERE id = ?',
         Bind  => [ \$Param{ID} ],
@@ -148,16 +148,16 @@ sub Get {
     my %DefaultRecipient;
     while ( my @Data = $DBObject->FetchrowArray() ) {
         %DefaultRecipient = (
-            ID            => $Data[0],
-            Title         => $Data[1],
-            RemoveDefault => $Data[2],
-            AddNew        => $Data[3],
-            NewAddress    => $Data[4],
-            Comment       => $Data[5],
-            CreateTime    => $Data[6],
-            CreateBy      => $Data[7],
-            ChangeTime    => $Data[8],
-            ChangeBy      => $Data[9],
+            ID         => $Data[0],
+            Title      => $Data[1],
+            RemoveTo   => $Data[2],
+            AddNew     => $Data[3],
+            NewAddress => $Data[4],
+            Comment    => $Data[5],
+            CreateTime => $Data[6],
+            CreateBy   => $Data[7],
+            ChangeTime => $Data[8],
+            ChangeBy   => $Data[9],
         );
     }
 

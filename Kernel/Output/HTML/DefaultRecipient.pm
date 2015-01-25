@@ -63,20 +63,20 @@ sub Run {
         TemplateID => $Ticket->{TemplateID},
     );
 
-    my $RemoveDefault = 0;
+    my $RemoveTo = 0;
     my @Addresses = ();
     foreach my $ID ( values %MappedDefaultRecipient ) {
         my %DefaultRecipient = $Self->{DefaultRecipientObject}->Get(
             ID => $ID,
         );
 
-        $RemoveDefault = 1 if $DefaultRecipient{RemoveDefault};
+        $RemoveTo = 1 if $DefaultRecipient{RemoveTo};
         if ( $DefaultRecipient{AddNew} ) {
             push @Addresses, $DefaultRecipient{NewAddress};
         }
     }
 
-    if ( $RemoveDefault ) {
+    if ( $RemoveTo ) {
         # remove preselected "To" address
         for my $block ( @$BlockData ) {
             if ( $block->{Name} eq 'PreFilledToRow' ) {

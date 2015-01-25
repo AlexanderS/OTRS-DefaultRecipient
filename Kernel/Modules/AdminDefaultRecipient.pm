@@ -74,8 +74,7 @@ sub Run {
         my $DefaultRecipientObject = $Kernel::OM->Get('Kernel::System::DefaultRecipient');
         my @NewIDs = $Self->{ParamObject}->GetArray( Param => 'IDs' );
         my ( %GetParam, %Errors );
-        for my $Parameter (qw(ID Title RemoveDefault AddNew NewAddress
-                              Comment)) {
+        for my $Parameter (qw(ID Title RemoveTo AddNew NewAddress Comment)) {
             $GetParam{$Parameter} = $Self->{ParamObject}->GetParam(
                 Param => $Parameter
             );
@@ -165,8 +164,7 @@ sub Run {
         my @NewIDs = $Self->{ParamObject}->GetArray( Param => 'IDs' );
         my ( %GetParam, %Errors );
 
-        for my $Parameter (qw(ID Title RemoveDefault AddNew NewAddress
-                              Comment)) {
+        for my $Parameter (qw(ID Title RemoveTo AddNew NewAddress Comment)) {
             $GetParam{$Parameter} = $Self->{ParamObject}->GetParam( Param => $Parameter );
         }
 
@@ -270,10 +268,10 @@ sub _Edit {
 
     $Param{DefaultRecipientTitleString} = '';
 
-    $Param{DefaultRecipientRemoveDefaultOption} = $Self->{LayoutObject}->BuildSelection(
+    $Param{DefaultRecipientRemoveToOption} = $Self->{LayoutObject}->BuildSelection(
         Data       => $Self->{ConfigObject}->Get('YesNoOptions'),
-        Name       => 'RemoveDefault',
-        SelectedID => $Param{RemoveDefault} || 0,
+        Name       => 'RemoveTo',
+        SelectedID => $Param{RemoveTo} || 0,
     );
 
     $Param{DefaultRecipientAddNewOption} = $Self->{LayoutObject}->BuildSelection(
@@ -341,7 +339,7 @@ sub _Overview {
         $Self->{LayoutObject}->Block(
             Name => 'OverviewResultRow',
             Data => {
-                RemoveDefaultYesNo => $YesNo{ $DefaultRecipient{RemoveDefault} },
+                RemoveToYesNo => $YesNo{ $DefaultRecipient{RemoveTo} },
                 AddNewYesNo => $YesNo{ $DefaultRecipient{AddNew} },
                 %DefaultRecipient,
             },
