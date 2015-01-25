@@ -30,7 +30,7 @@
                     <Name Translatable="1">DefaultRecipient</Name>
                     <Description Translatable="1">Create and manage DefaultRecipients.</Description>
                     <Block>Queue</Block>
-                    <Prio>300</Prio>
+                    <Prio>1000</Prio>
                 </NavBarModule>
             </FrontendModuleReg>
         </Setting>
@@ -50,7 +50,7 @@
                     <Name Translatable="1">Templates &lt;-&gt; DefaultRecipient</Name>
                     <Description Translatable="1">Link templates to DefaultRecipients.</Description>
                     <Block>Queue</Block>
-                    <Prio>300</Prio>
+                    <Prio>1100</Prio>
                 </NavBarModule>
             </FrontendModuleReg>
         </Setting>
