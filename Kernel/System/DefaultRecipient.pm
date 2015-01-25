@@ -47,7 +47,7 @@ sub Add {
     # insert new DefaultRecipient
     return if !$DBObject->Do(
         SQL => 'INSERT INTO default_recipient '
-             . '(title, remove_to, to, cc, bcc, comments, '
+             . '(title, remove_to, to_addr, cc_addr, bcc_addr, comments, '
              . ' create_time, create_by, change_time, change_by) '
              . 'VALUES (?, ?, ?, ?, ?, ?, '
              . 'current_timestamp, ?, current_timestamp, ?)',
@@ -105,7 +105,7 @@ sub Update {
     # insert new DefaultRecipient
     return if !$DBObject->Do(
         SQL => 'UPDATE default_recipient SET title = ?, remove_to = ?, '
-             . 'to = ?, cc = ?, bcc = ?, comments = ?, '
+             . 'to_addr = ?, cc_addr = ?, bcc_addr = ?, comments = ?, '
              . 'change_by = ?, change_time = current_timestamp '
              . 'WHERE id = ?',
         Bind => [
@@ -140,7 +140,7 @@ sub Get {
 
     # get RrsponseChangeDefaultTO obejct
     return if !$DBObject->Prepare(
-        SQL => 'SELECT id, title, remove_to, to, cc, bcc, '
+        SQL => 'SELECT id, title, remove_to, to_addr, cc_addr, bcc_addr, '
              . 'comments, create_time, create_by, change_time, change_by '
              . 'FROM default_recipient WHERE id = ?',
         Bind  => [ \$Param{ID} ],
