@@ -114,6 +114,15 @@ sub Run {
         );
     }
 
+    foreach my $Address ( @BccAddresses ) {
+        $Self->{LayoutObject}->AddJSOnDocumentComplete(
+            Code => 'Core.Agent.CustomerSearch.AddTicketCustomer( '
+                  . "'BccCustomer', "
+                  . $Self->{LayoutObject}->JSONEncode( Data => $Address )
+                  . ' );',
+        );
+    }
+
     return $Param{Data};
 }
 
