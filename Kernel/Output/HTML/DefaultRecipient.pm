@@ -98,6 +98,11 @@ sub Run {
         }
     }
 
+    # set focus to text field
+    $Self->{LayoutObject}->AddJSOnDocumentComplete(
+        Code => "\$('#RichText').focus();"
+    );
+
     return $Param{Data};
 }
 
