@@ -19,8 +19,6 @@ sub new {
     # allocate new hash for object
     my $Self = {};
     $Self->{LayoutObject} = $Param{LayoutObject} || die "Got no LayoutObject!";
-    $Self->{LogObject} = $Kernel::OM->Get('Kernel::System::Log');
-    $Self->{DefaultRecipientObject} = $Kernel::OM->Get('Kernel::System::DefaultRecipient');
     bless( $Self, $Type );
 
     return $Self;
@@ -30,13 +28,10 @@ sub Run {
     my ( $Self, %Param ) = @_;
     return if !$Self->{LayoutObject};
 
-    for (qw(LogObject LayoutObject DefaultRecipientObject)) {
-        return if !$Self->{$_};
-    }
-
     # check needed stuff
     if ( !defined $Param{Data} ) {
-        $Self->{LogObject}->Log(
+        my $LogObject = $Kernel::OM->Get('Kernel::System::Log');
+        $LogObject->Log(
             Priority => 'error',
             Message => 'Need Data!'
         );
@@ -59,7 +54,8 @@ sub Run {
     return unless $Ticket->{ResponseID};
 
     # get all DefaultRecipient
-    my %MappedDefaultRecipient = $Self->{DefaultRecipientObject}->MappingList(
+    my $DefaultRecipientObject = $Kernel::OM->Get('Kernel::System::DefaultRecipient');
+    my %MappedDefaultRecipient = $DefaultRecipientObject->MappingList(
         TemplateID => $Ticket->{ResponseID},
     );
 
@@ -68,7 +64,7 @@ sub Run {
     my @CcAddresses = ();
     my @BccAddresses = ();
     foreach my $ID ( values %MappedDefaultRecipient ) {
-        my %DefaultRecipient = $Self->{DefaultRecipientObject}->Get(
+        my %DefaultRecipient = $DefaultRecipientObject->Get(
             ID => $ID,
         );
 
