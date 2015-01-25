@@ -56,11 +56,11 @@ sub Run {
     } 
 
     # return if not generated from template
-    return unless $Ticket->{TemplateID};
+    return unless $Ticket->{ResponseID};
 
     # get all DefaultRecipient
     my %MappedDefaultRecipient = $Self->{DefaultRecipientObject}->MappingList(
-        TemplateID => $Ticket->{TemplateID},
+        TemplateID => $Ticket->{ResponseID},
     );
 
     my $RemoveTo = 0;
