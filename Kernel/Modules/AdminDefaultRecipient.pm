@@ -266,15 +266,11 @@ sub _Edit {
     $Self->{LayoutObject}->Block( Name => 'ActionList' );
     $Self->{LayoutObject}->Block( Name => 'ActionOverview' );
 
-    $Param{DefaultRecipientTitleString} = '';
-
     $Param{DefaultRecipientRemoveToOption} = $Self->{LayoutObject}->BuildSelection(
         Data       => $Self->{ConfigObject}->Get('YesNoOptions'),
         Name       => 'RemoveTo',
         SelectedID => $Param{RemoveTo} || 0,
     );
-
-    $Param{DefaultRecipientNewAddressString} = '';
 
     $Self->{LayoutObject}->Block(
         Name => 'OverviewUpdate',
