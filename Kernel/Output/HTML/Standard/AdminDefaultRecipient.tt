@@ -71,7 +71,7 @@
                         <tr>
                             <th>[% Translate("Title") | html %]</th>
                             <th>[% Translate("Remove 'To'") | html %]</th>
-                            <th>[% Translate("New address") | html %]</th>
+                            <th>[% Translate("New 'To'") | html %]</th>
                             <th>[% Translate("Comment") | html %]</th>
                             <th>[% Translate("Changed") | html %]</th>
                             <th>[% Translate("Created") | html %]</th>
@@ -95,7 +95,7 @@
                                 <a class="AsBlock" href="[% Env("Baselink") %]Action=[% Env("Action") %];Subaction=Change;ID=[% Data.ID | uri %]">[% Data.Title | html %]</a>
                             </td>
                             <td>[% Translate(Data.RemoveToYesNo) | html %]</td>
-                            <td>[% Data.NewAddress | html %]</td>
+                            <td>[% Data.AddTo | html %]</td>
                             <td title="[% Data.Comment | html %]">[% Data.Comment | truncate(26) | html %]</td>
                             <td>[% Data.ChangeTime | Localize("TimeShort") %]</td>
                             <td>[% Data.CreateTime | Localize("TimeShort") %]</td>
@@ -157,9 +157,9 @@
                         </div>
                         <div class="Clear"></div>
 
-                        <label for="NewAddress">[% Translate("New address") | html %]:</label>
+                        <label for="AddTo">[% Translate("New 'To'") | html %]:</label>
                         <div class="Field">
-                            <input type="text" name="NewAddress" id="NewAddress" value="[% Data.NewAddress | html %]" class="W50pc" maxlength="200"/>
+                            <input type="text" name="AddTo" id="AddTo" value="[% Data.AddTo | html %]" class="W50pc" maxlength="200"/>
                         </div>
                         <div class="Clear"></div>
 

@@ -71,8 +71,8 @@ sub Run {
         );
 
         $RemoveTo = 1 if $DefaultRecipient{RemoveTo};
-        if ( $DefaultRecipient{NewAddress} ne '' ) {
-            push @Addresses, $DefaultRecipient{NewAddress};
+        if ( $DefaultRecipient{AddTo} ne '' ) {
+            push @Addresses, $DefaultRecipient{AddTo};
         }
     }
 

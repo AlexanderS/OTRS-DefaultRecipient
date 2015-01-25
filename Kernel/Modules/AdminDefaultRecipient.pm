@@ -74,7 +74,7 @@ sub Run {
         my $DefaultRecipientObject = $Kernel::OM->Get('Kernel::System::DefaultRecipient');
         my @NewIDs = $Self->{ParamObject}->GetArray( Param => 'IDs' );
         my ( %GetParam, %Errors );
-        for my $Parameter (qw(ID Title RemoveTo NewAddress Comment)) {
+        for my $Parameter (qw(ID Title RemoveTo AddTo Comment)) {
             $GetParam{$Parameter} = $Self->{ParamObject}->GetParam(
                 Param => $Parameter
             );
@@ -164,7 +164,7 @@ sub Run {
         my @NewIDs = $Self->{ParamObject}->GetArray( Param => 'IDs' );
         my ( %GetParam, %Errors );
 
-        for my $Parameter (qw(ID Title RemoveTo NewAddress Comment)) {
+        for my $Parameter (qw(ID Title RemoveTo AddTo Comment)) {
             $GetParam{$Parameter} = $Self->{ParamObject}->GetParam( Param => $Parameter );
         }
 
