@@ -25,6 +25,8 @@
       <Column Name="title" Required="true" Size="250" Type="VARCHAR"/>
       <Column Name="remove_to" Required="true" Type="SMALLINT"/>
       <Column Name="add_to" Required="false" Size="255" Type="VARCHAR"/>
+      <Column Name="add_cc" Required="false" Size="255" Type="VARCHAR"/>
+      <Column Name="add_bcc" Required="false" Size="255" Type="VARCHAR"/>
       <Column Name="comments" Required="false" Size="250" Type="VARCHAR"/>
       <Column Name="create_time" Required="true" Type="DATE"/>
       <Column Name="create_by" Required="true" Type="INTEGER"/>

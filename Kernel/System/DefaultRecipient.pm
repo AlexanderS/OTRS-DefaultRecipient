@@ -31,7 +31,7 @@ sub Add {
     my ( $Self, %Param ) = @_;
 
     # check needed stuff
-    for my $Needed (qw(Title RemoveTo AddTo Comment UserID)) {
+    for my $Needed (qw(Title RemoveTo AddTo AddCc AddBcc Comment UserID)) {
         if ( ! defined $Param{$Needed} ) {
             my $LogObject = $Kernel::OM->Get('Kernel::System::Log');
             $LogObject->Log(
@@ -47,13 +47,16 @@ sub Add {
     # insert new DefaultRecipient
     return if !$DBObject->Do(
         SQL => 'INSERT INTO default_recipient '
-             . '(title, remove_to, add_to, comments, '
+             . '(title, remove_to, add_to, add_cc, add_bcc, comments, '
              . ' create_time, create_by, change_time, change_by) '
-             . 'VALUES (?, ?, ?, ?, current_timestamp, ?, current_timestamp, ?)',
+             . 'VALUES (?, ?, ?, ?, ?, ?, '
+             . 'current_timestamp, ?, current_timestamp, ?)',
         Bind => [
             \$Param{Title},
             \$Param{RemoveTo},
             \$Param{AddTo},
+            \$Param{AddCc},
+            \$Param{AddBcc},
             \$Param{Comment},
             \$Param{UserID},
             \$Param{UserID},
@@ -86,7 +89,7 @@ sub Update {
     my ( $Self, %Param ) = @_;
 
     # check needed stuff
-    for my $Needed (qw(ID Title RemoveTo AddTo Comment UserID)) {
+    for my $Needed (qw(ID Title RemoveTo AddTo AddCc AddBcc Comment UserID)) {
         if ( ! defined $Param{$Needed} ) {
             my $LogObject = $Kernel::OM->Get('Kernel::System::Log');
             $LogObject->Log(
@@ -102,13 +105,15 @@ sub Update {
     # insert new DefaultRecipient
     return if !$DBObject->Do(
         SQL => 'UPDATE default_recipient SET title = ?, remove_to = ?, '
-             . 'add_to = ?, comments = ?, change_by = ?, '
-             . 'change_time = current_timestamp '
+             . 'add_to = ?, add_cc = ?, add_bcc = ?, comments = ?, '
+             . 'change_by = ?, change_time = current_timestamp '
              . 'WHERE id = ?',
         Bind => [
             \$Param{Title},
             \$Param{RemoveTo},
             \$Param{AddTo},
+            \$Param{AddCc},
+            \$Param{AddBcc},
             \$Param{Comment},
             \$Param{UserID},
             \$Param{ID},
@@ -135,7 +140,7 @@ sub Get {
 
     # get RrsponseChangeDefaultTO obejct
     return if !$DBObject->Prepare(
-        SQL => 'SELECT id, title, remove_to, add_to, '
+        SQL => 'SELECT id, title, remove_to, add_to, add_cc, add_bcc, '
              . 'comments, create_time, create_by, change_time, change_by '
              . 'FROM default_recipient WHERE id = ?',
         Bind  => [ \$Param{ID} ],
@@ -149,11 +154,13 @@ sub Get {
             Title      => $Data[1],
             RemoveTo   => $Data[2],
             AddTo      => $Data[3],
-            Comment    => $Data[4],
-            CreateTime => $Data[5],
-            CreateBy   => $Data[6],
-            ChangeTime => $Data[7],
-            ChangeBy   => $Data[8],
+            AddCc      => $Data[4],
+            AddBcc     => $Data[5],
+            Comment    => $Data[6],
+            CreateTime => $Data[7],
+            CreateBy   => $Data[8],
+            ChangeTime => $Data[9],
+            ChangeBy   => $Data[10],
         );
     }
 

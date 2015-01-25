@@ -64,7 +64,9 @@ sub Run {
     );
 
     my $RemoveTo = 0;
-    my @Addresses = ();
+    my @ToAddresses = ();
+    my @CcAddresses = ();
+    my @BccAddresses = ();
     foreach my $ID ( values %MappedDefaultRecipient ) {
         my %DefaultRecipient = $Self->{DefaultRecipientObject}->Get(
             ID => $ID,
@@ -72,7 +74,13 @@ sub Run {
 
         $RemoveTo = 1 if $DefaultRecipient{RemoveTo};
         if ( $DefaultRecipient{AddTo} ne '' ) {
-            push @Addresses, $DefaultRecipient{AddTo};
+            push @ToAddresses, $DefaultRecipient{AddTo};
+        }
+        if ( $DefaultRecipient{AddCc} ne '' ) {
+            push @CcAddresses, $DefaultRecipient{AddCc};
+        }
+        if ( $DefaultRecipient{AddBcc} ne '' ) {
+            push @BccAddresses, $DefaultRecipient{AddBcc};
         }
     }
 
@@ -88,9 +96,18 @@ sub Run {
     }
 
     # add new addresses
-    foreach my $Address ( @Addresses ) {
+    foreach my $Address ( @ToAddresses ) {
         $Self->{LayoutObject}->Block(
             Name => 'PreFilledToRow',
+            Data => {
+                Email => $Address,
+            },
+        );
+    }
+
+    foreach my $Address ( @CcAddresses ) {
+        $Self->{LayoutObject}->Block(
+            Name => 'PreFilledCcRow',
             Data => {
                 Email => $Address,
             },
