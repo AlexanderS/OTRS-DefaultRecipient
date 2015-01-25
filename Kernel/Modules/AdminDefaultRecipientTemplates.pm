@@ -231,13 +231,19 @@ sub _Change {
     $Self->{LayoutObject}->Block( Name => 'ActionOverview' );
     $Self->{LayoutObject}->Block( Name => 'Filter' );
 
+    my %DisplayName = (
+        Template => 'Template',
+        DefaultRecipient => 'Default Recipient',
+    );
+
     $Self->{LayoutObject}->Block(
         Name => 'Change',
         Data => {
             ID         => $Param{ID},
             Name       => $Param{Name},
             ActionHome => 'Admin' . $Type,
-            NeType     => $NeType,
+            Header     => $DisplayName{ $NeType },
+            Type       => $Type,
         },
     );
 

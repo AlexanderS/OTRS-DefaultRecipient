@@ -86,7 +86,7 @@
                 </div>
                 <div class="Size1of2">
                     <ul class="Tablelike" id="DefaultRecipient">
-                        <li class="Header">[% Translate("DefaultRecipient") | html %]</li>
+                        <li class="Header">[% Translate("Default Recipients") | html %]</li>
                         <li class="FilterMessage Hidden">[% Translate("No matches found.") | html %]</li>
 [% RenderBlockStart("NoDefaultRecipientFoundMsg") %]
                         <li>[% Translate("No data found.") | html %]</li>
@@ -126,7 +126,7 @@
                     <table class="DataTable VariableWidth" id="ItemsTable">
                         <thead>
                             <tr>
-                                <th>[% Translate(Data.NeType) | html %]</th>
+                                <th>[% Translate(Data.Header) | html %]</th>
                                 <th class="[% Data.Mark | html %]">
                                     <input type="checkbox" id="SelectAllItemsSelected" name="ItemsSelected" title="[% Translate("Toggle active state for all") | html %]" value="" />
                                     [% Translate("Active") | html %]
