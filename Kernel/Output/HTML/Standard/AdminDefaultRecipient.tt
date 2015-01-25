@@ -49,7 +49,7 @@
             <div class="Content">
 
                 <p class="FieldExplanation">
-                    [% Translate("With DefaultRecipient you could change or extend the default To address in a ticket response dependent on the used template.") | html %]
+                    [% Translate("With DefaultRecipient you could change or extend the default addresses in a ticket response dependent on the used template.") | html %]
                 </p>
                 <p>
                     [% Translate("Attention") | html %]:
