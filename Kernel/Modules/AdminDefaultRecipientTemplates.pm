@@ -12,13 +12,7 @@ package Kernel::Modules::AdminDefaultRecipientTemplates;
 use strict;
 use warnings;
 
-our @ObjectDependencies = qw(
-    Kernel::Output::HTML::Layout
-    Kernel::System::DB
-    Kernel::System::DefaultRecipient
-    Kernel::System::StandardTemplate
-    Kernel::System::Web::Request
-);
+our $ObjectManagerDisabled = 1;
 
 sub new {
     my ( $Type, %Param ) = @_;
@@ -27,18 +21,14 @@ sub new {
     my $Self = {%Param};
     bless( $Self, $Type );
 
-    # check all needed objects
-    for (qw(ParamObject DBObject LayoutObject)) {
-        if ( !$Self->{$_} ) {
-            $Self->{LayoutObject}->FatalError( Message => "Got no $_!" );
-        }
-    }
-
     return $Self;
 }
 
 sub Run {
     my ( $Self, %Param ) = @_;
+
+    my $LayoutObject = $Kernel::OM->Get('Kernel::Output::HTML::Layout');
+    my $ParamObject  = $Kernel::OM->Get('Kernel::System::Web::Request');
 
     # ------------------------------------------------------------ #
     # template <-> DefaultRecipient 1:n
@@ -46,10 +36,10 @@ sub Run {
     if ( $Self->{Subaction} eq 'Template' ) {
 
         # get template data
-        my $ID = $Self->{ParamObject}->GetParam( Param => 'ID' );
+        my $ID = $ParamObject->GetParam( Param => 'ID' );
         my $StandardTemplateObject = $Kernel::OM->Get('Kernel::System::StandardTemplate');
         my %StandardTemplateData = $StandardTemplateObject->StandardTemplateGet( ID => $ID );
-        my $StandardTemplateType = $Self->{LayoutObject}->{LanguageObject}->Translate(
+        my $StandardTemplateType = $LayoutObject->{LanguageObject}->Translate(
             $StandardTemplateData{TemplateType},
         );
         my $Name = $StandardTemplateType . ' - ' . $StandardTemplateData{Name};
@@ -61,16 +51,17 @@ sub Run {
             TemplateID => $ID,
         );
 
-        my $Output = $Self->{LayoutObject}->Header();
-        $Output .= $Self->{LayoutObject}->NavigationBar();
+        my $Output = $LayoutObject->Header();
+        $Output .= $LayoutObject->NavigationBar();
         $Output .= $Self->_Change(
+            $LayoutObject,
             Data    => \%DefaultRecipientData,
             ID      => $ID,
             Name    => $Name,
             Mapping => \%Member,
             Type     => 'Template',
         );
-        $Output .= $Self->{LayoutObject}->Footer();
+        $Output .= $LayoutObject->Footer();
         return $Output;
     }
 
@@ -79,7 +70,7 @@ sub Run {
     # ------------------------------------------------------------ #
     elsif ( $Self->{Subaction} eq 'DefaultRecipient' ) {
 
-        my $ID = $Self->{ParamObject}->GetParam( Param => 'ID' );
+        my $ID = $ParamObject->GetParam( Param => 'ID' );
         my $DefaultRecipientObject = $Kernel::OM->Get('Kernel::System::DefaultRecipient');
         my %DefaultRecipientData = $DefaultRecipientObject->Get( ID => $ID );
 
@@ -95,7 +86,7 @@ sub Run {
                     ID => $StandardTemplateID
                 );
                 $StandardTemplateData{$StandardTemplateID}
-                    = $Self->{LayoutObject}->{LanguageObject}->Translate( $Data{TemplateType} )
+                    = $LayoutObject->{LanguageObject}->Translate( $Data{TemplateType} )
                     . ' - '
                     . $Data{Name};
             }
@@ -106,16 +97,17 @@ sub Run {
             DefaultRecipientID => $ID,
         );
 
-        my $Output = $Self->{LayoutObject}->Header();
-        $Output .= $Self->{LayoutObject}->NavigationBar();
+        my $Output = $LayoutObject->Header();
+        $Output .= $LayoutObject->NavigationBar();
         $Output .= $Self->_Change(
+            $LayoutObject,
             Data    => \%StandardTemplateData,
             ID      => $ID,
             Name    => $DefaultRecipientData{Title},
             Mapping => \%Member,
             Type    => 'DefaultRecipient',
         );
-        $Output .= $Self->{LayoutObject}->Footer();
+        $Output .= $LayoutObject->Footer();
         return $Output;
     }
 
@@ -125,18 +117,18 @@ sub Run {
     elsif ( $Self->{Subaction} eq 'ChangeDefaultRecipient' ) {
 
         # challenge token check for write action
-        $Self->{LayoutObject}->ChallengeTokenCheck();
+        $LayoutObject->ChallengeTokenCheck();
 
         # get current mapping
-        my $ID = $Self->{ParamObject}->GetParam( Param => 'ID' );
+        my $ID = $ParamObject->GetParam( Param => 'ID' );
         my $DefaultRecipientObject = $Kernel::OM->Get('Kernel::System::DefaultRecipient');
         my %Mapping = $DefaultRecipientObject->MappingList(
             DefaultRecipientID => $ID,
         );
 
         # get new templates
-        my @TemplatesSelected = $Self->{ParamObject}->GetArray( Param => 'ItemsSelected' );
-        my @TemplatesAll      = $Self->{ParamObject}->GetArray( Param => 'ItemsAll' );
+        my @TemplatesSelected = $ParamObject->GetArray( Param => 'ItemsSelected' );
+        my @TemplatesAll      = $ParamObject->GetArray( Param => 'ItemsAll' );
 
         # create hash with selected templates
         my %TemplatesSelected = map { $_ => 1 } @TemplatesSelected;
@@ -160,7 +152,7 @@ sub Run {
             }
         }
 
-        return $Self->{LayoutObject}->Redirect( OP => "Action=$Self->{Action}" );
+        return $LayoutObject->Redirect( OP => "Action=$Self->{Action}" );
     }
 
     # ------------------------------------------------------------ #
@@ -169,18 +161,18 @@ sub Run {
     elsif ( $Self->{Subaction} eq 'ChangeTemplate' ) {
 
         # challenge token check for write action
-        $Self->{LayoutObject}->ChallengeTokenCheck();
+        $LayoutObject->ChallengeTokenCheck();
 
         # get current mapping
-        my $ID = $Self->{ParamObject}->GetParam( Param => 'ID' );
+        my $ID = $ParamObject->GetParam( Param => 'ID' );
         my $DefaultRecipientObject = $Kernel::OM->Get('Kernel::System::DefaultRecipient');
         my %Mapping = $DefaultRecipientObject->MappingList(
             TemplateID => $ID,
         );
 
         # get new queues
-        my @Selected = $Self->{ParamObject}->GetArray( Param => 'ItemsSelected' );
-        my @All      = $Self->{ParamObject}->GetArray( Param => 'ItemsAll' );
+        my @Selected = $ParamObject->GetArray( Param => 'ItemsSelected' );
+        my @All      = $ParamObject->GetArray( Param => 'ItemsAll' );
 
         # create hash with selected queues
         my %Selected = map { $_ => 1 } @Selected;
@@ -204,21 +196,23 @@ sub Run {
             }
         }
 
-        return $Self->{LayoutObject}->Redirect( OP => "Action=$Self->{Action}" );
+        return $LayoutObject->Redirect( OP => "Action=$Self->{Action}" );
     }
 
     # ------------------------------------------------------------ #
     # overview
     # ------------------------------------------------------------ #
-    my $Output = $Self->{LayoutObject}->Header();
-    $Output .= $Self->{LayoutObject}->NavigationBar();
-    $Output .= $Self->_Overview();
-    $Output .= $Self->{LayoutObject}->Footer();
+    my $Output = $LayoutObject->Header();
+    $Output .= $LayoutObject->NavigationBar();
+    $Output .= $Self->_Overview($LayoutObject);
+    $Output .= $LayoutObject->Footer();
     return $Output;
 }
 
 sub _Change {
-    my ( $Self, %Param ) = @_;
+    my ( $Self, $LayoutObject, %Param ) = @_;
+
+    my $LayoutObject = $Kernel::OM->Get('Kernel::Output::HTML::Layout');
 
     my %Data    = %{ $Param{Data} };
     my %Mapping = %{ $Param{Mapping} };
@@ -226,17 +220,17 @@ sub _Change {
     my $NeType  = 'DefaultRecipient';
     $NeType     = 'Template' if $Type eq 'DefaultRecipient';
 
-    $Self->{LayoutObject}->Block( Name => 'Overview' );
-    $Self->{LayoutObject}->Block( Name => 'ActionList' );
-    $Self->{LayoutObject}->Block( Name => 'ActionOverview' );
-    $Self->{LayoutObject}->Block( Name => 'Filter' );
+    $LayoutObject->Block( Name => 'Overview' );
+    $LayoutObject->Block( Name => 'ActionList' );
+    $LayoutObject->Block( Name => 'ActionOverview' );
+    $LayoutObject->Block( Name => 'Filter' );
 
     my %DisplayName = (
         Template => 'Template',
         DefaultRecipient => 'Default Recipient',
     );
 
-    $Self->{LayoutObject}->Block(
+    $LayoutObject->Block(
         Name => 'Change',
         Data => {
             ID         => $Param{ID},
@@ -247,14 +241,14 @@ sub _Change {
         },
     );
 
-    $Self->{LayoutObject}->Block( Name => "ChangeHeader$NeType" );
+    $LayoutObject->Block( Name => "ChangeHeader$NeType" );
 
     for my $ID ( sort { uc( $Data{$a} ) cmp uc( $Data{$b} ) } keys %Data ) {
 
         # set output class
         my $Selected = $Mapping{$ID} ? ' checked="checked"' : '';
 
-        $Self->{LayoutObject}->Block(
+        $LayoutObject->Block(
             Name => 'ChangeRow',
             Data => {
                 Type      => $NeType,
@@ -265,25 +259,25 @@ sub _Change {
         );
     }
 
-    return $Self->{LayoutObject}->Output(
+    return $LayoutObject->Output(
         TemplateFile => 'AdminDefaultRecipientTemplates',
         Data         => \%Param,
     );
 }
 
 sub _Overview {
-    my ( $Self, %Param ) = @_;
+    my ( $Self, $LayoutObject, %Param ) = @_;
 
-    $Self->{LayoutObject}->Block(
+    $LayoutObject->Block(
         Name => 'Overview',
         Data => {},
     );
 
     # no actions in action list
-    #    $Self->{LayoutObject}->Block(Name=>'ActionList');
-    $Self->{LayoutObject}->Block( Name => 'FilterTemplate' );
-    $Self->{LayoutObject}->Block( Name => 'FilterDefaultRecipient' );
-    $Self->{LayoutObject}->Block( Name => 'OverviewResult' );
+    #    $LayoutObject->Block(Name=>'ActionList');
+    $LayoutObject->Block( Name => 'FilterTemplate' );
+    $LayoutObject->Block( Name => 'FilterDefaultRecipient' );
+    $LayoutObject->Block( Name => 'OverviewResult' );
 
     # get std template list
     my $StandardTemplateObject = $Kernel::OM->Get('Kernel::System::StandardTemplate');
@@ -298,7 +292,7 @@ sub _Overview {
                 ID => $StandardTemplateID,
             );
             $StandardTemplateData{$StandardTemplateID}
-                = $Self->{LayoutObject}->{LanguageObject}->Translate( $Data{TemplateType} )
+                = $LayoutObject->{LanguageObject}->Translate( $Data{TemplateType} )
                 . ' - '
                 . $Data{Name};
         }
@@ -309,7 +303,7 @@ sub _Overview {
         {
 
             # set output class
-            $Self->{LayoutObject}->Block(
+            $LayoutObject->Block(
                 Name => 'List1n',
                 Data => {
                     Name      => $StandardTemplateData{$StandardTemplateID},
@@ -322,7 +316,7 @@ sub _Overview {
 
     # otherwise it displays a no data found message
     else {
-        $Self->{LayoutObject}->Block(
+        $LayoutObject->Block(
             Name => 'NoTemplatesFoundMsg',
             Data => {},
         );
@@ -341,7 +335,7 @@ sub _Overview {
         {
 
             # set output class
-            $Self->{LayoutObject}->Block(
+            $LayoutObject->Block(
                 Name => 'Listn1',
                 Data => {
                     Name      => $DefaultRecipientData{$ID},
@@ -354,14 +348,14 @@ sub _Overview {
 
     # otherwise it displays a no data found message
     else {
-        $Self->{LayoutObject}->Block(
+        $LayoutObject->Block(
             Name => 'NoDefaultRecipientFoundMsg',
             Data => {},
         );
     }
 
     # return output
-    return $Self->{LayoutObject}->Output(
+    return $LayoutObject->Output(
         TemplateFile => 'AdminDefaultRecipientTemplates',
         Data         => \%Param,
     );

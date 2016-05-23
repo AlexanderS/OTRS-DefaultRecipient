@@ -12,13 +12,7 @@ package Kernel::Modules::AdminDefaultRecipient;
 use strict;
 use warnings;
 
-our @ObjectDependencies = qw(
-    Kernel::Config
-    Kernel::Output::HTML::Layout
-    Kernel::System::DB
-    Kernel::System::Web::Request
-    Kernel::System::DefaultRecipient
-);
+our $ObjectManagerDisabled = 1;
 
 sub new {
     my ( $Type, %Param ) = @_;
@@ -27,40 +21,39 @@ sub new {
     my $Self = {%Param};
     bless( $Self, $Type );
 
-    # check all needed objects
-    for my $Needed (qw(ParamObject DBObject LayoutObject ConfigObject)) {
-        if ( !$Self->{$Needed} ) {
-            $Self->{LayoutObject}->FatalError( Message => "Got no $Needed!" );
-        }
-    }
-
     return $Self;
 }
 
 sub Run {
     my ( $Self, %Param ) = @_;
 
+    my $ConfigObject = $Kernel::OM->Get('Kernel::Config');
+    my $LayoutObject = $Kernel::OM->Get('Kernel::Output::HTML::Layout');
+    my $ParamObject  = $Kernel::OM->Get('Kernel::System::Web::Request');
+
     # ------------------------------------------------------------ #
     # change
     # ------------------------------------------------------------ #
     if ( $Self->{Subaction} eq 'Change' ) {
-        my $ID = $Self->{ParamObject}->GetParam( Param => 'ID' ) || '';
+        my $ID = $ParamObject->GetParam( Param => 'ID' ) || '';
         my $DefaultRecipientObject = $Kernel::OM->Get('Kernel::System::DefaultRecipient');
         my %Data = $DefaultRecipientObject->Get(
             ID => $ID,
         );
 
-        my $Output = $Self->{LayoutObject}->Header();
-        $Output .= $Self->{LayoutObject}->NavigationBar();
+        my $Output = $LayoutObject->Header();
+        $Output .= $LayoutObject->NavigationBar();
         $Self->_Edit(
+            $LayoutObject,
+            $ConfigObject,
             Action => 'Change',
             %Data,
         );
-        $Output .= $Self->{LayoutObject}->Output(
+        $Output .= $LayoutObject->Output(
             TemplateFile => 'AdminDefaultRecipient',
             Data         => \%Param,
         );
-        $Output .= $Self->{LayoutObject}->Footer();
+        $Output .= $LayoutObject->Footer();
         return $Output;
     }
 
@@ -69,13 +62,13 @@ sub Run {
     # ------------------------------------------------------------ #
     elsif ( $Self->{Subaction} eq 'ChangeAction' ) {
         # challenge token check for write action
-        $Self->{LayoutObject}->ChallengeTokenCheck();
+        $LayoutObject->ChallengeTokenCheck();
 
         my $DefaultRecipientObject = $Kernel::OM->Get('Kernel::System::DefaultRecipient');
-        my @NewIDs = $Self->{ParamObject}->GetArray( Param => 'IDs' );
+        my @NewIDs = $ParamObject->GetArray( Param => 'IDs' );
         my ( %GetParam, %Errors );
         for my $Parameter (qw(ID Title RemoveTo To Cc Bcc Comment)) {
-            $GetParam{$Parameter} = $Self->{ParamObject}->GetParam(
+            $GetParam{$Parameter} = $ParamObject->GetParam(
                 Param => $Parameter
             );
         }
@@ -103,33 +96,35 @@ sub Run {
                  )
                )
             {
-                $Self->_Overview();
-                my $Output = $Self->{LayoutObject}->Header();
-                $Output .= $Self->{LayoutObject}->NavigationBar();
-                $Output .= $Self->{LayoutObject}->Notify( Info => 'DefaultRecipient updated!' );
-                $Output .= $Self->{LayoutObject}->Output(
+                $Self->_Overview($LayoutObject);
+                my $Output = $LayoutObject->Header();
+                $Output .= $LayoutObject->NavigationBar();
+                $Output .= $LayoutObject->Notify( Info => 'DefaultRecipient updated!' );
+                $Output .= $LayoutObject->Output(
                     TemplateFile => 'AdminDefaultRecipient',
                     Data         => \%Param,
                 );
-                $Output .= $Self->{LayoutObject}->Footer();
+                $Output .= $LayoutObject->Footer();
                 return $Output;
             }
         }
 
         # something has gone wrong
-        my $Output = $Self->{LayoutObject}->Header();
-        $Output .= $Self->{LayoutObject}->NavigationBar();
-        $Output .= $Self->{LayoutObject}->Notify( Priority => 'Error' );
+        my $Output = $LayoutObject->Header();
+        $Output .= $LayoutObject->NavigationBar();
+        $Output .= $LayoutObject->Notify( Priority => 'Error' );
         $Self->_Edit(
+            $LayoutObject,
+            $ConfigObject,
             Action              => 'Change',
             Errors              => \%Errors,
             %GetParam,
         );
-        $Output .= $Self->{LayoutObject}->Output(
+        $Output .= $LayoutObject->Output(
             TemplateFile => 'AdminDefaultRecipient',
             Data         => \%Param,
         );
-        $Output .= $Self->{LayoutObject}->Footer();
+        $Output .= $LayoutObject->Footer();
         return $Output;
     }
 
@@ -137,19 +132,21 @@ sub Run {
     # add
     # ------------------------------------------------------------ #
     elsif ( $Self->{Subaction} eq 'Add' ) {
-        my $Title = $Self->{ParamObject}->GetParam( Param => 'Title' );
+        my $Title = $ParamObject->GetParam( Param => 'Title' );
 
-        my $Output = $Self->{LayoutObject}->Header();
-        $Output .= $Self->{LayoutObject}->NavigationBar();
+        my $Output = $LayoutObject->Header();
+        $Output .= $LayoutObject->NavigationBar();
         $Self->_Edit(
+            $LayoutObject,
+            $ConfigObject,
             Action => 'Add',
             Title => $Title,
         );
-        $Output .= $Self->{LayoutObject}->Output(
+        $Output .= $LayoutObject->Output(
             TemplateFile => 'AdminDefaultRecipient',
             Data         => \%Param,
         );
-        $Output .= $Self->{LayoutObject}->Footer();
+        $Output .= $LayoutObject->Footer();
         return $Output;
     }
 
@@ -158,14 +155,14 @@ sub Run {
     # ------------------------------------------------------------ #
     elsif ( $Self->{Subaction} eq 'AddAction' ) {
         # challenge token check for write action
-        $Self->{LayoutObject}->ChallengeTokenCheck();
+        $LayoutObject->ChallengeTokenCheck();
 
         my $DefaultRecipientObject = $Kernel::OM->Get('Kernel::System::DefaultRecipient');
-        my @NewIDs = $Self->{ParamObject}->GetArray( Param => 'IDs' );
+        my @NewIDs = $ParamObject->GetArray( Param => 'IDs' );
         my ( %GetParam, %Errors );
 
         for my $Parameter (qw(ID Title RemoveTo To Cc Bcc Comment)) {
-            $GetParam{$Parameter} = $Self->{ParamObject}->GetParam( Param => $Parameter );
+            $GetParam{$Parameter} = $ParamObject->GetParam( Param => $Parameter );
         }
 
         # check needed data
@@ -188,33 +185,35 @@ sub Run {
             );
 
             if ($ID) {
-                $Self->_Overview();
-                my $Output = $Self->{LayoutObject}->Header();
-                $Output .= $Self->{LayoutObject}->NavigationBar();
-                $Output .= $Self->{LayoutObject}->Notify( Info => 'DefaultRecipient added!' );
-                $Output .= $Self->{LayoutObject}->Output(
+                $Self->_Overview($LayoutObject);
+                my $Output = $LayoutObject->Header();
+                $Output .= $LayoutObject->NavigationBar();
+                $Output .= $LayoutObject->Notify( Info => 'DefaultRecipient added!' );
+                $Output .= $LayoutObject->Output(
                     TemplateFile => 'AdminDefaultRecipient',
                     Data         => \%Param,
                 );
-                $Output .= $Self->{LayoutObject}->Footer();
+                $Output .= $LayoutObject->Footer();
                 return $Output;
             }
         }
 
         # something has gone wrong
-        my $Output = $Self->{LayoutObject}->Header();
-        $Output .= $Self->{LayoutObject}->NavigationBar();
-        $Output .= $Self->{LayoutObject}->Notify( Priority => 'Error' );
+        my $Output = $LayoutObject->Header();
+        $Output .= $LayoutObject->NavigationBar();
+        $Output .= $LayoutObject->Notify( Priority => 'Error' );
         $Self->_Edit(
+            $LayoutObject,
+            $ConfigObject,
             Action              => 'Add',
             Errors              => \%Errors,
             %GetParam,
         );
-        $Output .= $Self->{LayoutObject}->Output(
+        $Output .= $LayoutObject->Output(
             TemplateFile => 'AdminDefaultRecipient',
             Data         => \%Param,
         );
-        $Output .= $Self->{LayoutObject}->Footer();
+        $Output .= $LayoutObject->Footer();
         return $Output;
     }
 
@@ -223,56 +222,56 @@ sub Run {
     # ------------------------------------------------------------ #
     elsif ( $Self->{Subaction} eq 'Delete' ) {
         # challenge token check for write action
-        $Self->{LayoutObject}->ChallengeTokenCheck();
+        $LayoutObject->ChallengeTokenCheck();
 
         my $DefaultRecipientObject = $Kernel::OM->Get('Kernel::System::DefaultRecipient');
-        my $ID = $Self->{ParamObject}->GetParam( Param => 'ID' );
+        my $ID = $ParamObject->GetParam( Param => 'ID' );
 
         my $Delete = $DefaultRecipientObject->Delete(
             ID => $ID,
         );
         if ( !$Delete ) {
-            return $Self->{LayoutObject}->ErrorScreen();
+            return $LayoutObject->ErrorScreen();
         }
 
-        return $Self->{LayoutObject}->Redirect( OP => "Action=$Self->{Action}" );
+        return $LayoutObject->Redirect( OP => "Action=$Self->{Action}" );
     }
 
     # ------------------------------------------------------------
     # overview
     # ------------------------------------------------------------
     else {
-        $Self->_Overview();
-        my $Output = $Self->{LayoutObject}->Header();
-        $Output .= $Self->{LayoutObject}->NavigationBar();
-        $Output .= $Self->{LayoutObject}->Output(
+        $Self->_Overview($LayoutObject);
+        my $Output = $LayoutObject->Header();
+        $Output .= $LayoutObject->NavigationBar();
+        $Output .= $LayoutObject->Output(
             TemplateFile => 'AdminDefaultRecipient',
             Data         => \%Param,
         );
-        $Output .= $Self->{LayoutObject}->Footer();
+        $Output .= $LayoutObject->Footer();
         return $Output;
     }
 }
 
 sub _Edit {
-    my ( $Self, %Param ) = @_;
+    my ( $Self, $LayoutObject, $ConfigObject, %Param ) = @_;
     $Param{Errors} = {} unless defined $Param{Errors};
 
-    $Self->{LayoutObject}->Block(
+    $LayoutObject->Block(
         Name => 'Overview',
         Data => \%Param,
     );
 
-    $Self->{LayoutObject}->Block( Name => 'ActionList' );
-    $Self->{LayoutObject}->Block( Name => 'ActionOverview' );
+    $LayoutObject->Block( Name => 'ActionList' );
+    $LayoutObject->Block( Name => 'ActionOverview' );
 
-    $Param{DefaultRecipientRemoveToOption} = $Self->{LayoutObject}->BuildSelection(
-        Data       => $Self->{ConfigObject}->Get('YesNoOptions'),
+    $Param{DefaultRecipientRemoveToOption} = $LayoutObject->BuildSelection(
+        Data       => $ConfigObject->Get('YesNoOptions'),
         Name       => 'RemoveTo',
         SelectedID => $Param{RemoveTo} || 0,
     );
 
-    $Self->{LayoutObject}->Block(
+    $LayoutObject->Block(
         Name => 'OverviewUpdate',
         Data => {
             %Param,
@@ -282,36 +281,36 @@ sub _Edit {
 
     # shows header
     if ( $Param{Action} eq 'Change' ) {
-        $Self->{LayoutObject}->Block( Name => 'HeaderEdit' );
+        $LayoutObject->Block( Name => 'HeaderEdit' );
     }
     else {
-        $Self->{LayoutObject}->Block( Name => 'HeaderAdd' );
+        $LayoutObject->Block( Name => 'HeaderAdd' );
     }
 
     # show appropriate messages for ServerError
     if ( defined $Param{Errors}->{TitleExists} && $Param{Errors}->{TitleExists} == 1 ) {
-        $Self->{LayoutObject}->Block( Name => 'ExistTitleServerError' );
+        $LayoutObject->Block( Name => 'ExistTitleServerError' );
     }
     else {
-        $Self->{LayoutObject}->Block( Name => 'TitleServerError' );
+        $LayoutObject->Block( Name => 'TitleServerError' );
     }
 
     return 1;
 }
 
 sub _Overview {
-    my ( $Self, %Param ) = @_;
+    my ( $Self, $LayoutObject, %Param ) = @_;
 
-    $Self->{LayoutObject}->Block(
+    $LayoutObject->Block(
         Name => 'Overview',
         Data => \%Param,
     );
 
-    $Self->{LayoutObject}->Block( Name => 'ActionList' );
-    $Self->{LayoutObject}->Block( Name => 'ActionAdd' );
-    $Self->{LayoutObject}->Block( Name => 'Filter' );
+    $LayoutObject->Block( Name => 'ActionList' );
+    $LayoutObject->Block( Name => 'ActionAdd' );
+    $LayoutObject->Block( Name => 'Filter' );
 
-    $Self->{LayoutObject}->Block(
+    $LayoutObject->Block(
         Name => 'OverviewResult',
         Data => \%Param,
     );
@@ -326,7 +325,7 @@ sub _Overview {
         );
 
         my %YesNo = ( 0 => 'No', 1 => 'Yes' );
-        $Self->{LayoutObject}->Block(
+        $LayoutObject->Block(
             Name => 'OverviewResultRow',
             Data => {
                 RemoveToYesNo => $YesNo{ $DefaultRecipient{RemoveTo} },
@@ -337,7 +336,7 @@ sub _Overview {
 
     # otherwise it displays a no data found message
     if ( ! %List ) {
-        $Self->{LayoutObject}->Block(
+        $LayoutObject->Block(
             Name => 'NoDataFoundMsg',
             Data => {},
         );
