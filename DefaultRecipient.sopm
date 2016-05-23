@@ -17,8 +17,8 @@
     <File Permission="644" Location="Kernel/Modules/AdminDefaultRecipient.pm"/>
     <File Permission="644" Location="Kernel/Modules/AdminDefaultRecipientTemplates.pm"/>
     <File Permission="644" Location="Kernel/Output/HTML/DefaultRecipient.pm"/>
-    <File Permission="644" Location="Kernel/Output/HTML/Standard/AdminDefaultRecipient.tt"/>
-    <File Permission="644" Location="Kernel/Output/HTML/Standard/AdminDefaultRecipientTemplates.tt"/>
+    <File Permission="644" Location="Kernel/Output/HTML/Templates/Standard/AdminDefaultRecipient.tt"/>
+    <File Permission="644" Location="Kernel/Output/HTML/Templates/Standard/AdminDefaultRecipientTemplates.tt"/>
     <File Permission="644" Location="Kernel/System/DefaultRecipient.pm"/>
   </Filelist>
   <DatabaseInstall>
