@@ -1,16 +1,17 @@
 # --
-# Kernel/Output/HTML/DefaultRecipient.pm
+# Kernel/Output/HTML/ArticleCompose/DefaultRecipient.pm
 # Copyright (C) 2015 Alexander Sulfrian <alex@spline.inf.fu-berlin.de>
 # --
 
-package Kernel::Output::HTML::DefaultRecipient;
+package Kernel::Output::HTML::ArticleCompose::DefaultRecipient;
 
 use strict;
 use warnings;
 
 our @ObjectDependencies = qw(
-    Kernel::System::Log
+    Kernel::Output::HTML::Layout
     Kernel::System::DefaultRecipient
+    Kernel::System::Log
 );
 
 sub new {
@@ -18,7 +19,6 @@ sub new {
 
     # allocate new hash for object
     my $Self = {};
-    $Self->{LayoutObject} = $Param{LayoutObject} || die "Got no LayoutObject!";
     bless( $Self, $Type );
 
     return $Self;
@@ -26,7 +26,7 @@ sub new {
 
 sub Run {
     my ( $Self, %Param ) = @_;
-    return if !$Self->{LayoutObject};
+    my $LayoutObject = $Kernel::OM->Get('Kernel::Output::HTML::Layout');;
 
     # check needed stuff
     if ( !defined $Param{Data} ) {
@@ -35,10 +35,10 @@ sub Run {
             Priority => 'error',
             Message => 'Need Data!'
         );
-        $Self->{LayoutObject}->FatalDie();
+        $LayoutObject->FatalDie();
     }
 
-    my $BlockData = $Self->{LayoutObject}->{BlockData};
+    my $BlockData = $LayoutObject->{BlockData};
 
     # get ticket data
     my $Ticket;
@@ -51,6 +51,14 @@ sub Run {
     } 
 
     # return if not generated from template
+    unless ($Ticket->{ResponseID}) {
+        my $LogObject = $Kernel::OM->Get('Kernel::System::Log');
+        $LogObject->Log(
+            Priority => 'error',
+            Message => 'Need Data!'
+        );
+        $LayoutObject->FatalDie();
+    }
     return unless $Ticket->{ResponseID};
 
     # get all DefaultRecipient
@@ -70,7 +78,7 @@ sub Run {
 
         for my $addr (qw(To Cc Bcc)) {
             if ( $DefaultRecipient{ $addr } ne '' ) {
-                push $Addresses{ $addr }, $DefaultRecipient{ $addr };
+                push @{$Addresses{ $addr }}, $DefaultRecipient{ $addr };
             }
         }
     }
@@ -83,23 +91,23 @@ sub Run {
             }
         }
 
-        $Self->{LayoutObject}->{BlockData} = $BlockData;
+        $LayoutObject->{BlockData} = $BlockData;
     }
 
     # add new addresses
     for my $addr (qw(To Cc Bcc)) {
         for my $Address ( @{$Addresses{ $addr }} ) {
-            $Self->{LayoutObject}->AddJSOnDocumentComplete(
+            $LayoutObject->AddJSOnDocumentComplete(
                 Code => 'Core.Agent.CustomerSearch.AddTicketCustomer( '
                       . "'${addr}Customer', "
-                      . $Self->{LayoutObject}->JSONEncode( Data => $Address )
+                      . $LayoutObject->JSONEncode( Data => $Address )
                       . ' );',
             );
         }
     }
 
     # set focus to text field
-    $Self->{LayoutObject}->AddJSOnDocumentComplete(
+    $LayoutObject->AddJSOnDocumentComplete(
         Code => "\$('#RichText').focus();"
     );
 
