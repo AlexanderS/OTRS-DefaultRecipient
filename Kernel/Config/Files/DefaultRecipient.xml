@@ -26,7 +26,7 @@
                 <Title Translatable="1">DefaultRecipient</Title>
                 <NavBarName>Admin</NavBarName>
                 <NavBarModule>
-                    <Module>Kernel::Output::HTML::NavBarModuleAdmin</Module>
+                    <Module>Kernel::Output::HTML::NavBar::ModuleAdmin</Module>
                     <Name Translatable="1">DefaultRecipient</Name>
                     <Description Translatable="1">Create and manage DefaultRecipients.</Description>
                     <Block>Queue</Block>
@@ -46,7 +46,7 @@
                 <Title Translatable="1">Templates &lt;-&gt; DefaultRecipient</Title>
                 <NavBarName>Admin</NavBarName>
                 <NavBarModule>
-                    <Module>Kernel::Output::HTML::NavBarModuleAdmin</Module>
+                    <Module>Kernel::Output::HTML::NavBar::ModuleAdmin</Module>
                     <Name Translatable="1">Templates &lt;-&gt; DefaultRecipient</Name>
                     <Description Translatable="1">Link templates to DefaultRecipients.</Description>
                     <Block>Queue</Block>
