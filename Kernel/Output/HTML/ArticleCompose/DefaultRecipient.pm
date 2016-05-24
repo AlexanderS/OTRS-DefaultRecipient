@@ -51,14 +51,16 @@ sub Run {
         TemplateID => $Self->{ResponseID},
     );
 
-    my $RemoveTo = 0;
+    my %Remove = ( To => 0, Cc => 0 );
     my %Addresses = ( To => [], Cc => [], Bcc => [] );
     foreach my $ID ( values %MappedDefaultRecipient ) {
         my %DefaultRecipient = $DefaultRecipientObject->Get(
             ID => $ID,
         );
 
-        $RemoveTo = 1 if $DefaultRecipient{RemoveTo};
+        for my $addr (qw(To Cc)) {
+            $Remove{$addr} = 1 if $DefaultRecipient{'Remove' . $addr};
+        }
 
         for my $addr (qw(To Cc Bcc)) {
             if ( $DefaultRecipient{ $addr } ne '' ) {
@@ -67,13 +69,16 @@ sub Run {
         }
     }
 
-    if ( $RemoveTo ) {
-        # remove preselected "To" address
+    if ( $Remove{To} || $Remove{Cc} ) {
+        # remove preselected addresses
         my @blocks = ();
 
         BLOCK:
         for my $block (@{$Self->{LayoutObject}{_JSOnDocumentComplete}}) {
-            next BLOCK if $block =~ m/Core\.Agent\.CustomerSearch\.AddTicketCustomer\(\s*'ToCustomer'/;
+            for my $addr (qw(To Cc)) {
+                next BLOCK if $Remove{$addr} &&
+                    $block =~ qr/Core\.Agent\.CustomerSearch\.AddTicketCustomer\(\s*'${addr}Customer'/;
+            }
             push @blocks, $block;
         }
 

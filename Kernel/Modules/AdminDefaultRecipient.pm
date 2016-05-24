@@ -67,7 +67,7 @@ sub Run {
         my $DefaultRecipientObject = $Kernel::OM->Get('Kernel::System::DefaultRecipient');
         my @NewIDs = $ParamObject->GetArray( Param => 'IDs' );
         my ( %GetParam, %Errors );
-        for my $Parameter (qw(ID Title RemoveTo To Cc Bcc Comment)) {
+        for my $Parameter (qw(ID Title RemoveTo RemoveCc To Cc Bcc Comment)) {
             $GetParam{$Parameter} = $ParamObject->GetParam(
                 Param => $Parameter
             );
@@ -161,7 +161,7 @@ sub Run {
         my @NewIDs = $ParamObject->GetArray( Param => 'IDs' );
         my ( %GetParam, %Errors );
 
-        for my $Parameter (qw(ID Title RemoveTo To Cc Bcc Comment)) {
+        for my $Parameter (qw(ID Title RemoveTo RemoveCc To Cc Bcc Comment)) {
             $GetParam{$Parameter} = $ParamObject->GetParam( Param => $Parameter );
         }
 
@@ -265,11 +265,14 @@ sub _Edit {
     $LayoutObject->Block( Name => 'ActionList' );
     $LayoutObject->Block( Name => 'ActionOverview' );
 
-    $Param{DefaultRecipientRemoveToOption} = $LayoutObject->BuildSelection(
-        Data       => $ConfigObject->Get('YesNoOptions'),
-        Name       => 'RemoveTo',
-        SelectedID => $Param{RemoveTo} || 0,
-    );
+    for my $addr (qw(To Cc)) {
+        $Param{'DefaultRecipientRemove' . $addr . 'Option'} =
+            $LayoutObject->BuildSelection(
+                Data       => $ConfigObject->Get('YesNoOptions'),
+                Name       => 'Remove' . $addr,
+                SelectedID => $Param{'Remove' . $addr} || 0,
+            );
+    }
 
     $LayoutObject->Block(
         Name => 'OverviewUpdate',
@@ -329,6 +332,7 @@ sub _Overview {
             Name => 'OverviewResultRow',
             Data => {
                 RemoveToYesNo => $YesNo{ $DefaultRecipient{RemoveTo} },
+                RemoveCcYesNo => $YesNo{ $DefaultRecipient{RemoveCc} },
                 %DefaultRecipient,
             },
         );

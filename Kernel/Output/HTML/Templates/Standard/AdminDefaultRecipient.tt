@@ -71,6 +71,7 @@
                         <tr>
                             <th>[% Translate("Title") | html %]</th>
                             <th>[% Translate("Remove 'To'") | html %]</th>
+                            <th>[% Translate("Remove 'Cc'") | html %]</th>
                             <th>[% Translate("To") | html %]</th>
                             <th>[% Translate("Cc") | html %]</th>
                             <th>[% Translate("Bcc") | html %]</th>
@@ -97,6 +98,7 @@
                                 <a class="AsBlock" href="[% Env("Baselink") %]Action=[% Env("Action") %];Subaction=Change;ID=[% Data.ID | uri %]">[% Data.Title | html %]</a>
                             </td>
                             <td>[% Translate(Data.RemoveToYesNo) | html %]</td>
+                            <td>[% Translate(Data.RemoveCcYesNo) | html %]</td>
                             <td>[% Data.To | html %]</td>
                             <td>[% Data.Cc | html %]</td>
                             <td>[% Data.Bcc | html %]</td>
@@ -158,6 +160,12 @@
                         <label for="RemoveTo">[% Translate("Remove 'To'") | html %]:</label>
                         <div class="Field">
                             [% Data.DefaultRecipientRemoveToOption %]
+                        </div>
+                        <div class="Clear"></div>
+
+                        <label for="RemoveCc">[% Translate("Remove 'Cc'") | html %]:</label>
+                        <div class="Field">
+                            [% Data.DefaultRecipientRemoveCcOption %]
                         </div>
                         <div class="Clear"></div>
 

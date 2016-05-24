@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <otrs_package version="1.0">
   <Name>DefaultRecipient</Name>
-  <Version>1.0.2</Version>
+  <Version>1.0.3</Version>
   <Framework>5.0.x</Framework>
   <Vendor>spline.de</Vendor>
   <URL>https://github.com/AlexanderS/OTRS-DefaultRecipient</URL>
@@ -25,6 +25,7 @@
       <Column Name="id" Required="true" PrimaryKey="true" AutoIncrement="true" Type="BIGINT"/>
       <Column Name="title" Required="true" Size="250" Type="VARCHAR"/>
       <Column Name="remove_to" Required="true" Type="SMALLINT"/>
+      <Column Name="remove_cc" Required="true" Type="SMALLINT"/>
       <Column Name="to_addr" Required="false" Size="255" Type="VARCHAR"/>
       <Column Name="cc_addr" Required="false" Size="255" Type="VARCHAR"/>
       <Column Name="bcc_addr" Required="false" Size="255" Type="VARCHAR"/>
@@ -66,4 +67,9 @@
     <TableDrop Name="default_recipient_response"/>
     <TableDrop Name="default_recipient"/>
   </DatabaseUninstall>
+  <DatabaseUpgrade>
+    <TableAlter Name="default_recipient" Version="1.0.3">
+        <ColumnAdd Name="remove_cc" Required="true" Type="SMALLINT"/>
+    </TableAlter>
+  </DatabaseUpgrade>
 </otrs_package>

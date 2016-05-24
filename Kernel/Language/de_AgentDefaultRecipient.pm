@@ -20,6 +20,7 @@ sub Data {
     $Self->{Translation}->{"Don't forget to add new DefaultRecipients to templates."} =
         'Vergessen Sie nicht, die Standardempfänger den Vorlagen zuzuordnern.';
     $Self->{Translation}->{"Remove 'To'"} = "'An' entfernen";
+    $Self->{Translation}->{"Remove 'Cc'"} = "'Cc' entfernen";
  
     $Self->{Translation}->{'Manage Template-DefaultRecipient Relations'} = 'Standardempfänger-Vorlagenzuordnungen verwalten';
     $Self->{Translation}->{'Default Recipients'} = 'Standardempfänger';
