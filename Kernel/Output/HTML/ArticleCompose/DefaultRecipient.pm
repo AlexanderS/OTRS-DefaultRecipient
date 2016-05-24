@@ -12,21 +12,25 @@ our @ObjectDependencies = qw(
     Kernel::Output::HTML::Layout
     Kernel::System::DefaultRecipient
     Kernel::System::Log
+    Kernel::System::Web::Request
 );
 
 sub new {
     my ( $Type, %Param ) = @_;
+    my $ParamObject = $Kernel::OM->Get('Kernel::System::Web::Request');
 
     # allocate new hash for object
     my $Self = {};
     bless( $Self, $Type );
+
+    $Self->{LayoutObject} = $Param{LayoutObject};
+    $Self->{ResponseID} = $ParamObject->GetParam( Param => 'ResponseID' );
 
     return $Self;
 }
 
 sub Run {
     my ( $Self, %Param ) = @_;
-    my $LayoutObject = $Kernel::OM->Get('Kernel::Output::HTML::Layout');;
 
     # check needed stuff
     if ( !defined $Param{Data} ) {
@@ -35,36 +39,16 @@ sub Run {
             Priority => 'error',
             Message => 'Need Data!'
         );
-        $LayoutObject->FatalDie();
+        $Self->{LayoutObject}->FatalDie();
     }
-
-    my $BlockData = $LayoutObject->{BlockData};
-
-    # get ticket data
-    my $Ticket;
-    BLOCK:
-    for my $block ( @$BlockData ) {
-        if ( $block->{Name} eq 'TicketBack' ) {
-            $Ticket = $block->{Data};
-            last BLOCK;
-        }
-    } 
 
     # return if not generated from template
-    unless ($Ticket->{ResponseID}) {
-        my $LogObject = $Kernel::OM->Get('Kernel::System::Log');
-        $LogObject->Log(
-            Priority => 'error',
-            Message => 'Need Data!'
-        );
-        $LayoutObject->FatalDie();
-    }
-    return unless $Ticket->{ResponseID};
+    return unless $Self->{ResponseID};
 
     # get all DefaultRecipient
     my $DefaultRecipientObject = $Kernel::OM->Get('Kernel::System::DefaultRecipient');
     my %MappedDefaultRecipient = $DefaultRecipientObject->MappingList(
-        TemplateID => $Ticket->{ResponseID},
+        TemplateID => $Self->{ResponseID},
     );
 
     my $RemoveTo = 0;
@@ -85,33 +69,35 @@ sub Run {
 
     if ( $RemoveTo ) {
         # remove preselected "To" address
-        for my $block ( @$BlockData ) {
-            if ( $block->{Name} eq 'PreFilledToRow' ) {
-                $block->{Data} = undef;
-            }
+        my @blocks = ();
+
+        BLOCK:
+        for my $block (@{$Self->{LayoutObject}{_JSOnDocumentComplete}}) {
+            next BLOCK if $block =~ m/Core\.Agent\.CustomerSearch\.AddTicketCustomer\(\s*'ToCustomer'/;
+            push @blocks, $block;
         }
 
-        $LayoutObject->{BlockData} = $BlockData;
+        $Self->{LayoutObject}{_JSOnDocumentComplete} = \@blocks;
     }
 
     # add new addresses
     for my $addr (qw(To Cc Bcc)) {
         for my $Address ( @{$Addresses{ $addr }} ) {
-            $LayoutObject->AddJSOnDocumentComplete(
+            $Self->{LayoutObject}->AddJSOnDocumentComplete(
                 Code => 'Core.Agent.CustomerSearch.AddTicketCustomer( '
                       . "'${addr}Customer', "
-                      . $LayoutObject->JSONEncode( Data => $Address )
+                      . $Self->{LayoutObject}->JSONEncode( Data => $Address )
                       . ' );',
             );
         }
     }
 
     # set focus to text field
-    $LayoutObject->AddJSOnDocumentComplete(
+    $Self->{LayoutObject}->AddJSOnDocumentComplete(
         Code => "\$('#RichText').focus();"
     );
 
-    return $Param{Data};
+    return 1;
 }
 
 1;
